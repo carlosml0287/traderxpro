@@ -4,7 +4,7 @@ import streamlit as st
 import yfinance as yf
 
 from bokeh.plotting import figure, show, column
-from bokeh.sampledata.stocks import MSFT
+#from bokeh.sampledata.stocks import MSFT
 from yahoofinancials import YahooFinancials
 from datetime import datetime, date, timedelta
 from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, CategoricalAxis,FactorRange
