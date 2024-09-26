@@ -9,7 +9,8 @@ from yahoofinancials import YahooFinancials
 from datetime import datetime, date, timedelta
 from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, CategoricalAxis,FactorRange
 
-file_path = r'pga_h.txt'
+file_path = r'./pages/pga_h.txt'
+
 
 tickers = [
 'AAPL',
