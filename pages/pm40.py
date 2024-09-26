@@ -9,7 +9,8 @@ from yahoofinancials import YahooFinancials
 from datetime import datetime, date, timedelta
 from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, CategoricalAxis,FactorRange
 
-file_path = r'C:\\Users\\carlo\\OneDrive\\Documentos\\TRADER\\traderapp\\data\\pm40_h.txt'
+file_path = r'..\\data\\pm40_h.txt'
+
 
 
 tickers = [
