@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 st.set_page_config(layout="wide", page_title="Grafica con indicadores")
 
 #file_path = 'C:/Users/carlo/OneDrive/Documentos/TRADER/traderapp/data/pga_h.txt'
-file_path = r'pga_h.txt'
+file_path = r'./pages/pga_h.txt'
 
 
 def load_dataset():
