@@ -12,7 +12,7 @@ from bokeh.layouts import gridplot
 
 #df = pandas.DataFrame()
 #df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv")
-file_path = r'C:\\Users\\carlo\\OneDrive\\Documentos\\TRADER\\traderapp\\pages\\pga_h.txt'
+file_path = r'pga_h.txt'
 df = pd.read_csv(file_path, sep='\t')
 lenght = len(df.index)
 
