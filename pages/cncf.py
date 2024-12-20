@@ -6,17 +6,16 @@ import numpy as np
 
 from bokeh.plotting import figure, show, column
 #from bokeh.sampledata.stocks import MSFT 25092024
-from yahoofinancials import YahooFinancials
 from datetime import datetime, date, timedelta
 from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, CategoricalAxis,FactorRange
 from scipy import stats
 import login
 
-st.set_page_config(layout="wide", page_title="PM40")
+st.set_page_config(layout="wide", page_title="CNCF")
 
 login.generarLogin()
 if 'usuario' in st.session_state:    
-    file_path = r'./data/pm40_h.txt'
+    file_path = r'./data/cncf_h.txt'
     tickers = [
     'AAPL',
     'AMZN',
@@ -38,18 +37,15 @@ if 'usuario' in st.session_state:
     'XOM'
     ]
 
-
     @st.cache_data
 
     def load_dataset3():
         df = pd.read_csv(file_path, sep='\t')
-        df['date'] = pd.to_datetime (df.date)
+        #df['date'] = pd.to_datetime (df.date)
         df['datetime'] = pd.to_datetime (df.datetime) 
         df["Datetime_str"] = df["datetime"].astype(str)
         df["BarColor"] = df[["open","close"]].apply(lambda o: "red" if o.open>o.close else "green", axis=1)
-        return df
-
-    
+        return df    
 
     df = load_dataset3()
 
@@ -59,65 +55,20 @@ if 'usuario' in st.session_state:
             companys,0)
 
     df_filtrado = df.query("companyName in @sel_companys")
-    casos=df_filtrado['id_posiblepm40'].drop_duplicates()
+    casos=df_filtrado['id_cncf'].drop_duplicates()
 
     sel_casos = st.sidebar.selectbox("Seleccionar caso:",
             casos,0)
 
-    df = df.query("companyName in @sel_companys and id_posiblepm40 == @sel_casos")
+    df = df.query("companyName in @sel_companys and id_cncf == @sel_casos")
     #reiniciar index dataframe
     df.reset_index(drop=True, inplace=True)
 
     #print (sel_companys)
     #print (sel_casos)
 
-    #crea la linea trend solo con los 2 valores HIGH mas altos a partir del ultimo trendlower
-    def collect_channel(candle, backcandles, window):
-        #localdf = df_h4[candle-backcandles-window:candle-window]
-        
-        highs = df[(df['ind_high']>0)].high.values
-        idxhighs = df[(df['ind_high']>0)].high.index
-
-        if len(highs)>=2:
-            sl_highs, interc_highs, r_value_h, _, _ = stats.linregress(idxhighs,highs)
-
-            return(sl_highs, interc_highs, r_value_h**2)
-        else:
-            return(0,0,0)
-    
-    #crea la linea trend con todos los datos HIGH a partir del ultimo trendlower
-    def collect_channel2(candle, backcandles, window):
-        #localdf = df_h4[candle-backcandles-window:candle-window]
-        tupla = df[['datetime', 'id_posiblepm40', 'iniTrendLow']].query("iniTrendLow==True")
-        fec = tupla['datetime'].iloc[0]
-        print("fecha:", fec)
-        
-        highs = df[(df['datetime']>=fec) & (df.index<=candle)].high.values
-        idxhighs = df[(df['datetime']>=fec) & (df.index<=candle)].high.index
-
-        if len(highs)>=2:
-            sl_highs, interc_highs, r_value_h, _, _ = stats.linregress(idxhighs,highs)
-
-            return(sl_highs, interc_highs, r_value_h**2)
-        else:
-            return(0,0,0)
-
-    #linea TREND
-    tupla = df.query("ind_posicion==0")
-    candle = tupla.index[0]
-    backcandles = 20
-    window = 0
-    sl_highs, interc_highs,  r_sq_h = collect_channel2(candle, backcandles, window)
-    x = np.array(range(candle-backcandles-window, candle+5))
-
-    dfTrend = pd.DataFrame(x, columns=["x"])
-    dfTrend['trend'] = sl_highs*dfTrend['x'] + interc_highs
-    resultprev=df.join(dfTrend)
-    df=resultprev.drop('x',axis=1)
-    del resultprev    
 
     st.dataframe(df)
-
 
     inc = df.query("close>open")
     dec = df.query("open>close")
@@ -125,7 +76,7 @@ if 'usuario' in st.session_state:
     TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
 
     p = figure(width=1000, height=500,
-            title="PM40",
+            title="CNCF",
             background_fill_color="#efefef",
             tooltips=[("datetime", "@Datetime_str"), ("open", "@open"), ("high","@high"), ("low","@low"), ("close","@close")]
             )
@@ -210,7 +161,7 @@ if 'usuario' in st.session_state:
     p.line(
     x="index",
     y="trend",
-    color="purple",
+    color="blue",
     legend_label="TENDENCIA",
     source=df)
 
@@ -221,6 +172,7 @@ if 'usuario' in st.session_state:
     p.yaxis.axis_label = "Precio"
     p.legend.location="top_left"
     p.legend.click_policy="hide"
+    p.legend.background_fill_alpha = 0.5
 
     ## Volume Bars Logic
     volume = figure(x_axis_type="datetime", height=120, width=1000, tooltips = [("Volumen", "@volume")],background_fill_color="#efefef")
