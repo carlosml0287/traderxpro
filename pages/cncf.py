@@ -11,7 +11,17 @@ from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, Categorica
 from scipy import stats
 import login
 
+#Importacion de json
+import json
+import requests
+from io import StringIO
+
 st.set_page_config(layout="wide", page_title="CNCF")
+
+#Configuracion del json
+#with open("config.json","r") as config_file:
+#    config=json.load(config_file)
+
 
 login.generarLogin()
 if 'usuario' in st.session_state:    
@@ -42,7 +52,7 @@ if 'usuario' in st.session_state:
     def load_dataset3():
         df = pd.read_csv(file_path, sep='\t')
         #df['date'] = pd.to_datetime (df.date)
-        df['datetime'] = pd.to_datetime (df.datetime) 
+        df['datetime'] = pd.to_datetime (df.datetime)
         df["Datetime_str"] = df["datetime"].astype(str)
         df["BarColor"] = df[["open","close"]].apply(lambda o: "red" if o.open>o.close else "green", axis=1)
         return df    

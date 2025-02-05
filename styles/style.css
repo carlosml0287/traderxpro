@@ -1,0 +1,39 @@
+/* Aseguramos que el contenedor principal ocupe todo el viewport */
+[data-testid="stAppViewContainer"] {
+    position: relative;
+    min-height: 100vh;    /* Ocupa toda la altura de la ventana */
+    width: 100vw;         /* Ocupa todo el ancho de la ventana */
+    background: url('https://thetork.com/demos/html/bitrader/assets/images/banner/home1/bg-dark.png') no-repeat center center fixed !important;
+    background-size: cover !important;
+}
+
+/* Pseudo-elemento para un degradado azul noche en la esquina superior izquierda */
+[data-testid="stAppViewContainer"]::before {
+    content: "";
+    position: absolute;
+    top: 5%;         /* Ajusta la posición vertical */
+    left: 5%;        /* Ajusta la posición horizontal */
+    width: 250px;    /* Ajusta el tamaño según necesites */
+    height: 250px;
+    background: radial-gradient(circle, rgba(25, 25, 112, 0.5), transparent);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Pseudo-elemento para un degradado azul noche en la esquina inferior derecha */
+[data-testid="stAppViewContainer"]::after {
+    content: "";
+    position: absolute;
+    bottom: 5%;      /* Ajusta la posición vertical */
+    right: 5%;       /* Ajusta la posición horizontal */
+    width: 350px;    /* Ajusta el tamaño según necesites */
+    height: 350px;
+    background: radial-gradient(circle, rgba(25, 25, 112, 0.5), transparent);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Oculta la cabecera de Streamlit si lo deseas */
+.stAppHeader {
+    visibility: hidden;
+}
