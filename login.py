@@ -1,73 +1,88 @@
 import streamlit as st
-import pandas as pd
+from firebase_config import db, firebase_admin
+from auth import validar_usuario_firestore,generar_google_login
+from components.sidebar import generarMenu
 
-# Validación simple de usuario y clave con un archivo csv
-
-def validarUsuario(usuario,clave):    
-    """Permite la validación de usuario y clave
-
-    Args:
-        usuario (str): usuario a validar
-        clave (str): clave del usuario
-
-    Returns:
-        bool: True usuario valido, False usuario invalido
-    """    
-    dfusuarios = pd.read_csv('usuarios.csv')
-    if len(dfusuarios[(dfusuarios['usuario']==usuario) & (dfusuarios['clave']==clave)])>0:
-        return True
-    else:
-        return False
-
-def generarMenu(usuario):
-    """Genera el menú dependiendo del usuario
-
-    Args:
-        usuario (str): usuario utilizado para generar el menú
-    """        
-    with st.sidebar:
-        # Cargamos la tabla de usuarios
-        dfusuarios = pd.read_csv('usuarios.csv')
-        # Filtramos la tabla de usuarios
-        dfUsuario =dfusuarios[(dfusuarios['usuario']==usuario)]
-        # Cargamos el nombre del usuario
-        nombre= dfUsuario['nombre'].values[0]
-        #Mostramos el nombre del usuario
-        st.write(f"Hola **:blue-background[{nombre}]** ")
-        # Mostramos los enlaces de páginas
-        st.page_link("inicio.py", label="Inicio", icon=":material/home:")
-        st.subheader("Tableros")
-        st.page_link("pages/pagina1.py", label="Ventas", icon=":material/sell:")
-        st.page_link("pages/pagina2.py", label="Compras", icon=":material/shopping_cart:")
-        st.page_link("pages/pagina3.py", label="Personal", icon=":material/group:")    
-        st.page_link("pages/pm40.py", label="PM40", icon=":material/data_thresholding:")
-        st.page_link("pages/cncf.py", label="CNCF", icon=":material/data_thresholding:")
-        st.page_link("pages/diario.py", label="diario", icon=":material/data_thresholding:")
-        # Botón para cerrar la sesión
-        btnSalir=st.button("Salir")
-        if btnSalir:
-            st.session_state.clear()
-            # Luego de borrar el Session State reiniciamos la app para mostrar la opción de usuario y clave
-            st.rerun()
-            
 
 def generarLogin():
     """Genera la ventana de login o muestra el menú si el login es valido
     """    
     # Validamos si el usuario ya fue ingresado    
-    if 'usuario' in st.session_state:
-        generarMenu(st.session_state['usuario']) # Si ya hay usuario cargamos el menu        
-    else: 
-        # Cargamos el formulario de login       
+    if 'usuario' in st.session_state:   
+        generarMenu()  # Si ya hay usuario cargamos el menú        
+    else:   
         with st.form('frmLogin'):
-            parUsuario = st.text_input('Usuario')
-            parPassword = st.text_input('Password',type='password')
-            btnLogin=st.form_submit_button('Ingresar',type='primary')
+            container_section=f"""
+            <style>
+                .section_login{{
+                    color:red;
+                    border: 2px solid rgba(61, 213, 109,0.8);
+                    border-radius:5px;
+                    background-color: transparent;
+                    text-align: center
+                }}
+            </style>
+            <div class="section_login">hOLA<div>
+            """
+            st.markdown(container_section, unsafe_allow_html=True)
+            usuario = st.text_input('Usuario')
+            password = st.text_input('Contraseña', type='password')
+            btnLogin = st.form_submit_button('Ingresar',use_container_width=True)
             if btnLogin:
-                if validarUsuario(parUsuario,parPassword):
-                    st.session_state['usuario'] =parUsuario
-                    # Si el usuario es correcto reiniciamos la app para que se cargue el menú
+                user_data = validar_usuario_firestore(usuario, password)
+                if user_data:
+                    st.session_state['usuario'] = user_data['user']
+                    st.session_state['nombre'] = user_data['name']
+                    st.success("Inicio de sesión exitoso")
                     st.rerun()
                 else:
-                    # Si el usuario es invalido, mostramos el mensaje de error
-                    st.error("Usuario o clave inválidos",icon=":material/gpp_maybe:")                    
+                    st.error("Usuario o clave incorrectos")
+                    
+            #Titulo para metodos alternaitvos de ingreso
+            st.markdown("<p style='text-align: left; font-weight: bold;'>Ingresar por:</p>", unsafe_allow_html=True)
+
+            # Botón para iniciar sesión con Google
+            google_url = generar_google_login()
+
+            google_button = f"""
+            <style>
+                .google-btn {{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 50px;
+                    height: 50px;
+                    background-color: white;
+                    border-radius: 50%;
+                    border: 2px solid rgb(61, 213, 109);
+                    box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+                    cursor: pointer;
+                    text-decoration: none;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }}
+                .google-btn:hover {{
+                    transform: scale(1.1);
+                    box-shadow: 0px 4px 8px rgba(0,0,0,0.3);
+                }}
+                .google-icon {{
+                    width: 24px;
+                    height: 24px;
+                }}
+                
+                .btn-container {{
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                }}
+            </style>
+
+            <div class="btn-container">
+                <a href="{google_url}" class="google-btn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" alt="Google Logo">
+                </a>
+            </div>
+            """
+            st.markdown(google_button, unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    generarLogin()

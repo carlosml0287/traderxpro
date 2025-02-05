@@ -3,6 +3,8 @@ import pandas as pd
 import streamlit as st
 import yfinance as yf
 import numpy as np
+import requests
+from io import StringIO
 
 from bokeh.plotting import figure, show, column
 #from bokeh.sampledata.stocks import MSFT 25092024
@@ -11,38 +13,32 @@ from datetime import datetime, date, timedelta
 from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, CategoricalAxis,FactorRange
 from scipy import stats
 import login
+import os
+
+#Importacion del archivo de configuracion 
+import json
 
 st.set_page_config(layout="wide", page_title="PM40")
 
+
 login.generarLogin()
+
+with open("config.json","r") as config_file:
+    config=json.load(config_file)
+
 if 'usuario' in st.session_state:    
-    file_path = r'./data/pm40_h.txt'
-    tickers = [
-    'AAPL',
-    'AMZN',
-    'GOOG',
-    'GOOGL',
-    'META',
-    'MSFT',
-    'QQQ',
-    'TSLA',
-    'SPY',
-    'NFLX',
-    'MRNA',
-    'TNA',
-    'GLD',
-    'SLV',
-    'USO',
-    'BAC',
-    'CVX',
-    'XOM'
-    ]
+    file_url = config["file_url"]
+    tickers = config["tickers"]
 
 
     @st.cache_data
-
     def load_dataset3():
-        df = pd.read_csv(file_path, sep='\t')
+        #Descargar el archivo desde la URL
+        response=requests.get(file_url)
+        print("hito 1")
+        #convertir el contenido a un archivo de memoria 
+        data=StringIO(response.text)
+        df = pd.read_csv(data, sep='\t')
         df['date'] = pd.to_datetime (df.date)
         df['datetime'] = pd.to_datetime (df.datetime) 
         df["Datetime_str"] = df["datetime"].astype(str)
@@ -53,23 +49,46 @@ if 'usuario' in st.session_state:
 
     df = load_dataset3()
 
+    #Filtramos las compañias
     companys = df['companyName'].drop_duplicates()
 
-    sel_companys = st.sidebar.selectbox("Seleccionar caso:",
-            companys,0)
+    #Selector para elegir una compañia
+    sel_companys = st.sidebar.selectbox("Seleccionar caso:", companys,0)
 
+    #Filtrar el dataframe por la compañia seleccionada
     df_filtrado = df.query("companyName in @sel_companys")
-    casos=df_filtrado['id_posiblepm40'].drop_duplicates()
+    
+    #Filtrar donde ind_posicion sea 0 y obtener solo las fechas de esos casos
+    df_casos_filtrados = df_filtrado[(df_filtrado.ind_posicion == 0) & (df_filtrado.id_posiblepm40!='') & (df_filtrado.id_posiblepm40.isnull()==False)][['id_posiblepm40', 'date']]
+    
+    #Convertir la fecha a string para mostrarla en selectbox
+    df_casos_filtrados['date_str'] = df_casos_filtrados['date'].astype(str)
+    
+    # Crear un diccionario que mapea fecha → id_posiblepm40
+    casos_dict = dict(zip(df_casos_filtrados['date_str'], df_casos_filtrados['id_posiblepm40']))
+    
+    # Mostrar selectbox con las fechas en lugar de los IDs
+    sel_fecha = st.sidebar.selectbox("Seleccionar fecha del caso:", list(casos_dict.keys()), 0)
 
-    sel_casos = st.sidebar.selectbox("Seleccionar caso:",
-            casos,0)
+    # Obtener el id_posiblepm40 correspondiente a la fecha seleccionada
+    sel_caso_id = casos_dict[sel_fecha]
 
-    df = df.query("companyName in @sel_companys and id_posiblepm40 == @sel_casos")
-    #reiniciar index dataframe
+    # Filtrar el DataFrame con la compañía y el caso seleccionado
+    df = df.query("companyName in @sel_companys and id_posiblepm40 == @sel_caso_id")
+
+    # Reiniciar los índices del DataFrame
     df.reset_index(drop=True, inplace=True)
+    
+ 
+       
+    
+    #casos=df_filtrado['id_posiblepm40'].drop_duplicates()
 
-    #print (sel_companys)
-    #print (sel_casos)
+    #sel_casos = st.sidebar.selectbox("Seleccionar caso:",casos,0)
+
+    #df = df.query("companyName in @sel_companys and id_posiblepm40 == @sel_casos")
+    #reiniciar index dataframe
+    #df.reset_index(drop=True, inplace=True) 
 
     #crea la linea trend solo con los 2 valores HIGH mas altos a partir del ultimo trendlower
     def collect_channel(candle, backcandles, window):
@@ -116,7 +135,7 @@ if 'usuario' in st.session_state:
     df=resultprev.drop('x',axis=1)
     del resultprev    
 
-    st.dataframe(df)
+    #st.dataframe(df)
 
 
     inc = df.query("close>open")
@@ -248,3 +267,5 @@ if 'usuario' in st.session_state:
 
     #show(p)
     st.bokeh_chart(fig, use_container_width=True)
+    
+    st.dataframe(df)
