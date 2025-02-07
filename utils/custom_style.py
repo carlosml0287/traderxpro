@@ -12,7 +12,7 @@ def load_css(css_relative_path: str):
     css_path = os.path.join(base_path, "..", css_relative_path)
     
     try:
-        with open(css_path) as f:
+        with open("styles/style.css", encoding="utf-8") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     except FileNotFoundError:
         st.error(f"No se encontró el archivo CSS: {css_path}")
