@@ -1,39 +1,364 @@
+:root{
+    --primary-color:#1D1D1D; /*rgba(29, 29, 29, 1)    */
+    --secondary-color:#56E990; /*rgba(86, 233, 144, 1)*/
+    --secondary-var1:#45ba73; /*rgba(69, 186, 115, 1)*/
+    --secondary-var2:#348c56; /*rgba(52, 140, 86, 1) */
+    --secondary-var3: #225d3a; /*rgba(34, 93, 58, 1)*/
+    --secondary-var4:#112f1d; /*rgba(17, 47, 29, 1)*/
+    --third-color:#bebebe;
+    --four-color:#fff;
+}
+
 /* Aseguramos que el contenedor principal ocupe todo el viewport */
 [data-testid="stAppViewContainer"] {
     position: relative;
-    min-height: 100vh;    /* Ocupa toda la altura de la ventana */
-    width: 100vw;         /* Ocupa todo el ancho de la ventana */
-    background: url('https://thetork.com/demos/html/bitrader/assets/images/banner/home1/bg-dark.png') no-repeat center center fixed !important;
+    height: 100vh;
+    width: 100vw;
+    background: 
+        radial-gradient(circle at 30% 20%, rgba(29, 29, 29, 0.8) 0%, rgba(29, 29, 29, 0.6) 30%, transparent 80%),
+        radial-gradient(circle at 70% 40%, rgba(29, 29, 29, 0.7) 10%, rgba(29, 29, 29, 0.5) 40%, transparent 85%),
+        radial-gradient(circle at 50% 80%, rgba(29, 29, 29, 0.6) 5%, rgba(29, 29, 29, 0.4) 30%, transparent 90%),
+        radial-gradient(circle at 40% 60%, rgba(34, 93, 58, 0.3) 5%, rgba(34, 93, 58, 0.15) 30%, transparent 85%),
+        linear-gradient(45deg, rgba(29, 29, 29, 0.9) 0%, rgba(29, 29, 29, 0.7) 40%, rgba(34, 93, 58, 0.4) 100%),
+        url('https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/fondo.png') no-repeat center center fixed !important;
     background-size: cover !important;
 }
 
-/* Pseudo-elemento para un degradado azul noche en la esquina superior izquierda */
-[data-testid="stAppViewContainer"]::before {
-    content: "";
-    position: absolute;
-    top: 5%;         /* Ajusta la posición vertical */
-    left: 5%;        /* Ajusta la posición horizontal */
-    width: 250px;    /* Ajusta el tamaño según necesites */
-    height: 250px;
-    background: radial-gradient(circle, rgba(25, 25, 112, 0.5), transparent);
-    z-index: 1;
-    pointer-events: none;
+
+[data-testid="stAppViewContainer"] {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+   
+    background-size: cover !important;
 }
 
-/* Pseudo-elemento para un degradado azul noche en la esquina inferior derecha */
-[data-testid="stAppViewContainer"]::after {
-    content: "";
-    position: absolute;
-    bottom: 5%;      /* Ajusta la posición vertical */
-    right: 5%;       /* Ajusta la posición horizontal */
-    width: 350px;    /* Ajusta el tamaño según necesites */
-    height: 350px;
-    background: radial-gradient(circle, rgba(25, 25, 112, 0.5), transparent);
-    z-index: 1;
-    pointer-events: none;
+
+
+/*---- FORMULARIO -----*/
+[data-testid="stForm"]{
+    background-color: var(--primary-color);
+    box-shadow: 0px 0px 11px var(--six-color);
+    padding: 10px 50px;
+    width: 60%;
+    margin: 0 auto;
+    max-width: 650px;
+    min-width: 400px;
+}
+
+[data-testid="stWidgetLabel"]{
+    color: var(--five-color);
+}
+
+[data-testid="stWidgetLabel"] p{
+    font-size: 21px;
+    font-weight: 500;
+}
+
+[data-testid="stTextInputRootElement"]{
+    background-color: rgba(29,29,29,0.94);
+    border-radius: 5px;
+    border-color: rgba(161,161,180, 0.7);
+    color: var(--four-color);
+    padding-right: 0;
+} 
+
+[data-testid="stTextInputRootElement"] button{
+    background-color: rgba(29,29,29,0.94);
+    color: var(--five-color);
+} 
+
+[data-testid="stTextInputRootElement"] input{
+    background-color: rgba(29,29,29,0.94);
+    padding-left: 20px;
+    color: var(--four-color);
+    caret-color: var(--five-color);
+} 
+
+/*- BOTON FORMULARIO*/
+[data-testid="stBaseButton-secondaryFormSubmit"]{
+    background-color: var(--five-color);
+    color: var(--primary-color);
+}
+
+[data-testid="stBaseButton-secondaryFormSubmit"] p{
+    font-weight: bold;
+    font-size: 17px;
+}
+
+
+[data-testid="stBaseButton-secondaryFormSubmit"]:hover{
+    background-color: var(--primary-color);
+    color: var(--five-color);
+    border-color: var(--five-color);
+}
+.btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 30px;
+}
+
+
+/* Estilo del botón de Google */
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;  /* Ancho del botón */
+    height: 50px;  /* Altura del botón */
+    background-color: transparent;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 25px; /* Bordes redondeados */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid var(--six-color);
+}
+
+/* Ícono de Google dentro del botón */
+.google-btn img {
+    margin-right: 10px; /* Espaciado a la derecha */
+    width: 24px;
+    height: 24px;
+}
+
+/* Efecto hover */
+.google-btn:hover {
+    background-color: rgba(25, 25, 112, 0.521);
+    color: white;
+    box-shadow: 0px 6px 10px rgba(66, 133, 244, 0.3);
+}
+
+/* Efecto de presionar */
+.google-btn:active {
+    transform: scale(0.95);
+}
+
+
+
+
+/*------ ENCABEZADOS ------------------*/
+.st-emotion-cache-1bobo2k  h3{
+    color: var(--five-color);
+    font-size: 40px;
+}
+
+
+.sidebar .stSelectbox div[data-baseweb="select"] {
+    border: 2px solid #007bff; /* Cambiar el borde del selectbox */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 5px;
 }
 
 /* Oculta la cabecera de Streamlit si lo deseas */
 .stAppHeader {
     visibility: hidden;
+}
+
+
+
+
+/*---RESPONSIVO---*/
+@media (max-width:480px) {
+    .st-emotion-cache-1bobo2k  h3{
+        text-align: center;
+    }
+}
+
+
+
+
+/*---------SIDER BAR ----------------*/
+[data-testid="stSidebarContent"]{
+    background: linear-gradient(to bottom, var(--secondary-var4) 5%, #1D1D1D 45%, #1D1D1D 50%)
+
+}
+
+/* Estilo del título principal */
+.sidebar-title {
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0px;
+    margin-bottom: 20px;
+    position: relative;
+    top: -30px;
+    color: var(--third-color);
+}
+
+
+[data-testid="stBaseButton-secondary"]{
+    background-color: var(--primary-color);
+    border-color: var(--four-color);
+    color: var(--four-color);
+}
+
+.divider {
+    border-bottom: 2px solid #444;
+    margin: 15px 0;
+}
+
+
+
+
+/*------------ SELECT BOX ---------*/
+.stSelectbox{
+    height: min-content;
+}
+
+.stSelectbox [data-testid="stWidgetLabel"]{
+    min-height: 0;
+}
+
+.stSelectbox [data-baseweb="select"]{
+    border: 0.1px solid var(--third-color);
+    border-radius: 10px;
+}
+
+
+
+
+
+
+
+.info-box h3{
+    font-size: 50px;
+}
+
+.info-box h3 small{
+    font-size: 50px;
+    color: var(--secondary-color);
+}
+
+.info-box p{
+    color: var(--third-color);
+}
+
+
+.main-container {
+    height: 60vh;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    padding: 10px;
+}
+
+.info-box {
+    flex: 1;
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    font-size: 18px;
+    width: 100%;
+    height: 100%;
+}
+
+.card-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex: 1.5;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 5px 5px 20px rgba(0,0,0,0.2);
+    padding: 10px 20px;
+}
+
+.card {
+    width: 33%;
+    height: 320px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Efecto de hover: la tarjeta se agranda y la sombra se intensifica */
+.card:hover {
+    transform: scale(1.2);
+    box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
+}
+
+/* Animación de movimiento (flotado) */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Asignación de animación a cada card dentro de .card-container */
+.card-container .card:nth-child(1) { 
+    animation: float 3s infinite ease-in-out; 
+}
+.card-container .card:nth-child(2) { 
+    animation: float 3s infinite ease-in-out 1s; 
+}
+.card-container .card:nth-child(3) { 
+    animation: float 3s infinite ease-in-out 2s; 
+}
+
+/* =========================== */
+/* Media queries para responsividad */
+/* =========================== */
+
+/* Para pantallas medianas (tablets, max-width: 768px) */
+@media screen and (max-width: 1299px) {
+    .main-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .info-box {
+        width: 90%;
+        margin-bottom: 20px;
+        height: auto;
+    }
+    .card-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        background-color: transparent; /* Opcional */
+    }
+    .card {
+        width: 200px;
+        height: 250px;
+    }
+    
+    /* Ocultar la tercera card en tablets */
+    .card-container .card:nth-child(3) {
+        display: none;
+    }
+}
+
+/* Para pantallas pequeñas (móviles, max-width: 480px) */
+@media screen and (max-width: 480px) {
+    .main-container {
+        padding: 5px;
+        gap: 10px;
+    }
+    .info-box {
+        font-size: 16px;
+        padding: 10px;
+    }
+    .card {
+        width: 160px;
+        height: 220px;
+        font-size: 14px;
+    }
+    
+    /* Ocultar la segunda y tercera card en móviles */
+    .card-container .card:nth-child(2),
+    .card-container .card:nth-child(3) {
+        display: none;
+    }
 }

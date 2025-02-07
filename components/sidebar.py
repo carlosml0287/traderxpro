@@ -1,20 +1,39 @@
 import streamlit as st
 
 def generarMenu():
-    """Genera el menú lateral."""
+    """Genera el menú lateral común solo una vez y retorna un placeholder para widgets específicos."""
+    # Si ya se generó el sidebar, retornamos el placeholder almacenado
+    if "sidebar_generated" in st.session_state:
+        return 
     with st.sidebar:
+        st.markdown('<div class="sidebar-title">TRADER XPRO</div>', unsafe_allow_html=True)
         nombre = st.session_state.get('nombre', 'Usuario')  
-        st.write(f"Hola **:blue-background[{nombre}]** ")
+        st.write(f"""<h3 >Hola <span style="background-color:#a1a1b4; color:#fff; padding:0px 4px; border-radius:4px">{nombre}</span></h3>""",unsafe_allow_html=True)
         st.page_link("inicio.py", label="Inicio", icon=":material/home:")
-        st.subheader("Tableros")
-        st.page_link("pages/pagina1.py", label="Ventas", icon=":material/sell:")
-        st.page_link("pages/pagina2.py", label="Compras", icon=":material/shopping_cart:")
-        st.page_link("pages/pagina3.py", label="Personal", icon=":material/group:")    
-        st.page_link("pages/pm40.py", label="PM40", icon=":material/data_thresholding:")
-        st.page_link("pages/cncf.py", label="CNCF", icon=":material/data_thresholding:")
-        st.page_link("pages/diario.py", label="Diario", icon=":material/data_thresholding:")
         
-        btnSalir = st.button("Salir")
-        if btnSalir:
-            st.session_state.clear()
-            st.rerun()
+        # PUEDE ACCEDER CUALQUIER USUARIO
+        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+        with st.expander("### Historical",expanded=True):
+            st.page_link("pages/pm40.py", label="PM40", icon=":material/data_thresholding:")
+            st.page_link("pages/cncf.py", label="CNCF", icon=":material/data_thresholding:")
+            st.page_link("pages/diario.py", label="Diario", icon=":material/data_thresholding:")
+        
+        
+        # RESTRINGIDO, SOLO PARA USUARIOS REGISTRADOS
+        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+        with st.expander("### Real Time",expanded=False):
+            st.page_link("pages/pm40.py", label="PM40", icon=":material/data_thresholding:")
+            st.page_link("pages/cncf.py", label="CNCF", icon=":material/data_thresholding:")
+            st.page_link("pages/diario.py", label="Diario", icon=":material/data_thresholding:")
+        
+        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+        with st.expander("### Login",expanded=False):
+            st.page_link("pages/login.py", label="Login", icon=":material/data_thresholding:")
+            st.page_link("pages/signup.py", label="Sign Up", icon=":material/data_thresholding:")
+        btnSalir = st.button("Salir",use_container_width=True,key="btnSalir")
+    if btnSalir:
+    # Borrar solo las variables relacionadas con la autenticación
+        keys_to_keep = ["sidebar_generated"]  
+
+# Exportamos el placeholder para que pueda ser usado en otras páginas
+#placeholder_sidebar = generarMenu()
