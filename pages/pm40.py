@@ -10,6 +10,8 @@ import json
 from datetime import datetime
 from layout import aplicar_layout  # Importa el decorador
 from utils.custom_style import load_css
+from bokeh.models import HoverTool
+
 
 # Carga de configuración
 st.set_page_config(layout="wide", page_title="PM40")
@@ -23,26 +25,44 @@ tickers = config["tickers"]
 
 # Función para agregar tarjetas personalizadas
 def agregar_tarjetas():
-    # Crear una estructura de columnas para mostrar las tarjetas como un tablero
-    col1, col2 = st.columns(2)  # Tres columnas
-
-    with col1:
-        st.markdown(
-            """
-            <div style="background-color:#1D1D1D; padding:20px; border:2px solid red; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                <h3>Tarjeta 1: Información Básica</h3>
-                <p>Aquí puedes agregar contenido sobre la compañía o cualquier otro dato.</p>
-            </div>
+    with st.container():
+        st.markdown("<h2 style="">Promedio Movil</h2>", unsafe_allow_html=True)
+        # Creamos 3 columnas
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+                <div class="card_promedio">
+                    <h3>Tarjeta 1</h3>
+                    <p>Contenido de la tarjeta 1. Información básica.</p>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+                <div class="card_promedio">
+                    <h3>Tarjeta 2</h3>
+                    <p>Contenido de la tarjeta 2. Información intermedia.</p>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+                <div class="card_promedio">
+                    <h3>Tarjeta 3</h3>
+                    <p>Contenido de la tarjeta 3. Detalles adicionales.</p>
+                </div>
             """, unsafe_allow_html=True)
 
-    with col2:
-        st.markdown(
-            """
-            <div style="background-color:#1D1D1D; border:4px solid red padding:20px; border-radius:8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                <h3 style="color:red; padding:10px;">Tarjeta 3: Detalles Adicionales</h3>
-                <p>Puedes agregar cualquier detalle adicional relevante.</p>
+    # Segundo contenedor: Información adicional que ocupa todo el ancho
+    with st.container():
+        st.markdown("<h2>Descripcion</h2>", unsafe_allow_html=True)
+        st.markdown("""
+            <div class="info-box">
+                <p>Aquí se muestra información adicional que ocupa todo el ancho del contenedor. 
+                Puedes incluir gráficos, tablas, textos detallados o cualquier otro contenido relevante.</p>
             </div>
-            """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
 @aplicar_layout  # Aplica el decorador para agregar el layout
 def mostrar_pm40():
@@ -96,16 +116,54 @@ def mostrar_pm40():
     inc = df.query("close > open")
     dec = df.query("open > close")
 
-    p = figure(width=1000, height=500,
-               title="PM40",
-               background_fill_color="#efefef",
-               tooltips=[("datetime", "@Datetime_str"), ("open", "@open"), ("high", "@high"), ("low", "@low"), ("close", "@close")]
-               )
+    # Definir la figura p (como ya lo tienes)
+    p = figure(
+        width=1000, 
+        height=500,
+        title="PM40",
+        background_fill_color="rgba(29, 29, 29, 0.5)",
+        border_fill_color="#1D1D1D",
+        outline_line_color=None,
+        tooltips=[("datetime", "@Datetime_str"), ("open", "@open"), ("high", "@high"), ("low", "@low"), ("close", "@close")]
+    )
+    # Ajustar colores de los ejes y texto
+    p.xaxis.major_label_text_color = "#56E990"
+    p.yaxis.major_label_text_color = "#56E990"
+    p.xaxis.axis_label_text_color = "#348c56"
+    p.yaxis.axis_label_text_color = "#348c56"
+    p.title.text_color = "#45ba73"
+    
+    #----
+    # (Opcional) Configurar la cuadrícula secundaria
+    p.xgrid.minor_grid_line_color = "#555555"
+    p.xgrid.minor_grid_line_dash = [2, 2]
+    p.xgrid.minor_grid_line_alpha = 0.5
+    p.ygrid.minor_grid_line_color = "#555555"
+    p.ygrid.minor_grid_line_dash = [2, 2]
+    p.ygrid.minor_grid_line_alpha = 0.5
+
+    p.xaxis.major_label_orientation = 0.8
+    p.x_range.range_padding = 0.05
+
+    # (Opcional) Configuración de la cuadrícula secundaria para el eje x
+    p.xgrid.minor_grid_line_color = "#555555"   # Color de las líneas secundarias
+    p.xgrid.minor_grid_line_dash = [2, 2]         # Patrón de guiones para las líneas menores
+    p.xgrid.minor_grid_line_alpha = 0.5           # Opacidad de las líneas secundarias
+
+    # (Opcional) Configuración de la cuadrícula secundaria para el eje y
+    p.ygrid.minor_grid_line_color = "#555555"
+    p.ygrid.minor_grid_line_dash = [2, 2]
+    p.ygrid.minor_grid_line_alpha = 0.5
+
+    
+    
+    
+
     p.xaxis.major_label_orientation = 0.8
     p.x_range.range_padding = 0.05
 
     # Segmentos de barras y tendencias
-    p.segment("index", "high", "index", "low", color="black", line_width=1, source=df)
+    p.segment("index", "high", "index", "low", color="white", line_width=1, source=df)
     p.vbar(x="index", width=0.6, bottom="open", top="close", fill_color="red", line_color="red", source=dec)
     p.vbar(x="index", width=0.6, bottom="open", top="close", fill_color="green", line_color="green", source=inc)
 
@@ -120,15 +178,32 @@ def mostrar_pm40():
 
     # Configuración del formato del eje Y y X
     p.yaxis[0].formatter = NumeralTickFormatter(format="$0.00")
+    p.legend.label_text_color = "#1D1D1D"
     p.xaxis.axis_label = "Fecha"
     p.yaxis.axis_label = "Precio"
     p.legend.location = "top_left"
     p.legend.click_policy = "hide"
+    
 
     # Configuración del gráfico de volumen
-    volume = figure(x_axis_type="datetime", height=120, width=1000, tooltips=[("Volumen", "@volume")], background_fill_color="#efefef")
+    volume = figure(x_axis_type="datetime", height=120, width=1000, tooltips=[("Volumen", "@volume")], background_fill_color="#1D1D1D", border_fill_color="#1D1D1D",      # Borde negro
+    outline_line_color=None)
     volume.vbar(x="index", width=0.6, top="volume", fill_color="BarColor", line_color="BarColor", source=df)
     volume.yaxis.axis_label = "Volumen"
+    volume.yaxis.axis_label_text_color = "white"
+    volume.yaxis.major_label_text_color = "#56E990"
+    
+    
+    
+    #asas
+    volume.grid.grid_line_color = "#444444"      # Color de la cuadrícula (un gris oscuro)
+    volume.grid.grid_line_dash = [6, 4]            # Patrón de guiones: 6 píxeles dibujados, 4 píxeles en pausa
+    volume.grid.grid_line_width = 1              # Ancho de las líneas
+    volume.grid.grid_line_alpha = 0.6            # Transparencia (0 a 1)
+
+    
+    
+    
 
     fig = column(children=[p, volume], sizing_mode="scale_width")
 
