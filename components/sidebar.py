@@ -30,10 +30,6 @@ def generarMenu():
         with st.expander("### Login",expanded=False):
             st.page_link("pages/login.py", label="Login", icon=":material/data_thresholding:")
             st.page_link("pages/signup.py", label="Sign Up", icon=":material/data_thresholding:")
-        btnSalir = st.button("Salir",use_container_width=True,key="btnSalir")
-    if btnSalir:
-    # Borrar solo las variables relacionadas con la autenticación
-        keys_to_keep = ["sidebar_generated"]  
 
 # Exportamos el placeholder para que pueda ser usado en otras páginas
 #placeholder_sidebar = generarMenu()
