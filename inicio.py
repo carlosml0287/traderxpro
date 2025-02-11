@@ -1,42 +1,40 @@
 import streamlit as st
+import sys, os
+from components.header_menu import generar_header
 st.set_page_config(page_title="Mi Aplicación", page_icon="📊", layout="wide")
 
-from components.sidebar import generarMenu
-from components.header_menu import generar_header
 from utils.custom_style import load_css
-from layout import aplicar_layout
-from pages.home import show
-import pages.login as login_page
-
-# Cargar estilos CSS personalizados
 load_css("styles/style.css")
 
-# Leer el query parameter
-query_params = st.query_params
-page = query_params.get("page", ["home"])[0]
+# Inicializar variables de sesión
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "visitor" not in st.session_state:
+    st.session_state.visitor = False
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "home"  # Se muestra home por defecto
 
-# Si se solicita logout, limpiamos la sesión y actualizamos el query parameter
-if page == "logout":
-    st.session_state.clear()
-    st.experimental_set_query_params(page="home")
-    page = "home"  # Redirigimos a home
+# Función de navegación: solo actualiza el estado
+def nav(page):
+    st.session_state.current_page = page
 
+# (Opcional) Generar el header, pasándole la función nav
+generar_header(nav)
 
-if page == "login":
-    # Si se ha solicitado el login, mostrarlo en esta misma página
-    login_page.generarLogin()
-elif page=="visitor":
-    # Si es modo visitante, activamos una bandera y mostramos la home con sidebar
-    st.session_state["visitor"] = True
-    # En caso contrario, usar el layout para mostrar la home
-    @aplicar_layout
-    def render_home():
-        show()
-    render_home()
+# Enrutador: carga la página según el valor actual
+current_page = st.session_state.current_page
+
+if current_page == "login":
+    import pages.login as login_page
+    login_page.app(nav)
+elif current_page == "home":
+    import pages.home as home_page
+    home_page.app(nav)
+elif current_page == "visitor":
+    import pages.visitor as visitor_page
+    visitor_page.app(nav)
+elif current_page == "signup":
+    import pages.signup as signup_page
+    signup_page.app(nav)
 else:
-    # Página de inicio normal
-    @aplicar_layout
-    def render_home():
-        show()
-    render_home()
-
+    st.write("Página no encontrada.")

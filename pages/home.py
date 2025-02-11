@@ -4,10 +4,8 @@ import pandas as pd
 from utils.custom_style import load_css
 
 
-load_css("styles/style.css")
-
-
-def show():
+def app(nav):
+    load_css("styles/style.css")
     st.markdown("""
                 <div class="main-container">
                     <div class="info-box">
@@ -76,4 +74,3 @@ def show():
         </div>
     </div>
     """, unsafe_allow_html=True)
-    

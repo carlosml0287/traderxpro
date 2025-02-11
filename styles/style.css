@@ -37,8 +37,8 @@
 
 /*---- FORMULARIO -----*/
 [data-testid="stForm"]{
-    background-color: var(--primary-color);
-    box-shadow: 0px 0px 11px var(--six-color);
+    background-color: rgba(17, 47, 29, 0.1);
+    box-shadow: 0px 0px 11px var(--secondary-var3);
     padding: 10px 50px;
     width: 60%;
     margin: 0 auto;
@@ -47,7 +47,7 @@
 }
 
 [data-testid="stWidgetLabel"]{
-    color: var(--five-color);
+    color: var(--third-color);
 }
 
 [data-testid="stWidgetLabel"] p{
@@ -56,29 +56,29 @@
 }
 
 [data-testid="stTextInputRootElement"]{
-    background-color: rgba(29,29,29,0.94);
     border-radius: 5px;
-    border-color: rgba(161,161,180, 0.7);
-    color: var(--four-color);
+    border-color: var(--primary-color);
     padding-right: 0;
+    box-shadow: 0px 0px 1.9px var(--third-color);
+
 } 
 
 [data-testid="stTextInputRootElement"] button{
-    background-color: rgba(29,29,29,0.94);
     color: var(--five-color);
 } 
 
 [data-testid="stTextInputRootElement"] input{
-    background-color: rgba(29,29,29,0.94);
     padding-left: 20px;
-    color: var(--four-color);
-    caret-color: var(--five-color);
+    color: var(--secondary-color);
+    caret-color: var(--secondary-color);
+    background-color: rgba(34, 93, 58, 0.2);
+
 } 
 
 /*- BOTON FORMULARIO*/
 [data-testid="stBaseButton-secondaryFormSubmit"]{
-    background-color: var(--five-color);
-    color: var(--primary-color);
+    background-color: var(--secondary-color);
+    color: var(--primary-color)
 }
 
 [data-testid="stBaseButton-secondaryFormSubmit"] p{
@@ -89,8 +89,8 @@
 
 [data-testid="stBaseButton-secondaryFormSubmit"]:hover{
     background-color: var(--primary-color);
-    color: var(--five-color);
-    border-color: var(--five-color);
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
 }
 .btn-container {
     display: flex;
@@ -128,9 +128,9 @@
 
 /* Efecto hover */
 .google-btn:hover {
-    background-color: rgba(25, 25, 112, 0.521);
+    background-color: rgba(52, 140, 86, 0.5);
     color: white;
-    box-shadow: 0px 6px 10px rgba(66, 133, 244, 0.3);
+    box-shadow: 0px 6px 10px var(--secondary-var1);
 }
 
 /* Efecto de presionar */
@@ -156,7 +156,7 @@
 
 /* Oculta la cabecera de Streamlit si lo deseas */
 .stAppHeader {
-    visibility: hidden;
+    visibility: none;
 }
 
 
