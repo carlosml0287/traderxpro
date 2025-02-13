@@ -2,9 +2,11 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 from utils.custom_style import load_css
+from layout import aplicar_layout
+from utils.update_state import nav
 
-
-def app(nav):
+@aplicar_layout(nav)
+def app():
     load_css("styles/style.css")
     st.markdown("""
                 <div class="main-container">
@@ -30,20 +32,6 @@ def app(nav):
 
     st.markdown("""
     <div class="container-outer">
-        <div class="card_">
-            <div class="col1">
-                <img src="https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/card1.png" alt="Tendencia Alcista">
-            </div>
-            <div class="col2">
-                <h3 > Tendencia Alcista</h3>
-                <p>
-                    La tendencia alcista es una condición de mercado en la que los precios suelen subir. Las tendencias alcistas pueden identificarse utilizando medias móviles, líneas de tendencia y niveles de soporte y resistencia. Estas son algunas características clave de una tendencia alcista:
-                    Los máximos de cada vela son superiores a los máximos de las velas anteriores.
-                    Los mínimos de cada vela son superiores a los mínimos de las velas anteriores.
-                    Es probable que la tendencia continúe hasta que los precios rompan por debajo del nivel de soporte importante.
-                </p>
-            </div>
-        </div>
         <div class="card_">
             <div class="col1">
                 <img src="https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/card1.png" alt="Tendencia Alcista">

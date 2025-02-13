@@ -1,8 +1,12 @@
 import streamlit as st
 from utils.custom_style import load_css
 from auth import validar_usuario_firestore, generar_google_login
+from layout import aplicar_layout  
+from utils.update_state import nav
 
+@aplicar_layout(nav)
 def app(nav):
+    st.text("HOLA SOY LOGIN")
     # Cargar estilos CSS personalizados
     load_css("styles/style.css")
     
@@ -46,7 +50,12 @@ def app(nav):
             st.session_state['usuario'] = user_data['user']
             st.session_state['nombre'] = user_data['name']
             st.success("Inicio de sesión exitoso")
-            # En lugar de st.rerun(), usamos la función de navegación para dirigir a la página principal
-            nav("home")
+            # Forzamos la redirección inmediata usando un placeholder con meta refresh:
+            placeholder = st.empty()
+            placeholder.markdown(
+                "<meta http-equiv='refresh' content='0; url=?page=home'>",
+                unsafe_allow_html=True
+            )
+            st.stop()  # Detenemos la ejecución actual para que se realice la recarga
         else:
             st.error("Usuario o clave incorrectos")
