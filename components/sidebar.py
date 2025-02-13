@@ -6,7 +6,6 @@ def generarMenu():
     if "sidebar_generated" in st.session_state:
         return 
     with st.sidebar:
-        st.markdown('<div class="sidebar-title">TRADER XPRO</div>', unsafe_allow_html=True)
         nombre = st.session_state.get('nombre', 'Usuario')  
         st.write(f"""<h3 >Hola <span style="background-color:#a1a1b4; color:#fff; padding:0px 4px; border-radius:4px">{nombre}</span></h3>""",unsafe_allow_html=True)
         st.page_link("inicio.py", label="Inicio", icon=":material/home:")
