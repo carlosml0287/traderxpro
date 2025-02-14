@@ -6,9 +6,6 @@ from utils.custom_style import load_css
 from utils.routerv2 import route
 load_css("styles/style.css")
 
-st.text("DEPURACIOPN")
-
 route()
 
 
-st.text("DEPURACIOON 02")

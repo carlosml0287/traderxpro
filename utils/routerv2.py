@@ -14,7 +14,6 @@ def route():
 
     st.text(f"LA PAGINA QUE SE ASINGA ES {current_page}")
     
-    
     if current_page == "login":
         from pages.login import app as login_app
         st.text("INGRESO A LOGIN")
