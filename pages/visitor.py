@@ -1,8 +1,8 @@
 import streamlit as st
+from layout import aplicar_layout_con_sidebar
 
-def app(nav):
+@aplicar_layout_con_sidebar()
+def app():
     st.title("Página para Visitantes")
     st.write("Bienvenido a la vista de visitante.")
     
-    if st.button("Ir a Home"):
-        nav("home")

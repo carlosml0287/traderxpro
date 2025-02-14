@@ -4,8 +4,8 @@ from auth import validar_usuario_firestore, generar_google_login
 from layout import aplicar_layout  
 from utils.update_state import nav
 
-@aplicar_layout(nav)
-def app(nav):
+@aplicar_layout()
+def app():
     st.text("HOLA SOY LOGIN")
     # Cargar estilos CSS personalizados
     load_css("styles/style.css")

@@ -5,7 +5,7 @@ from utils.custom_style import load_css
 from layout import aplicar_layout
 from utils.update_state import nav
 
-@aplicar_layout(nav)
+@aplicar_layout()
 def app():
     load_css("styles/style.css")
     st.markdown("""
