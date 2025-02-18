@@ -1,5 +1,7 @@
 import streamlit as st
 
+
+
 def generarMenu():
     """Genera el menú lateral común solo una vez y retorna un placeholder para widgets específicos."""
     # Si ya se generó el sidebar, retornamos el placeholder almacenado

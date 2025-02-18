@@ -8,10 +8,15 @@ from scipy import stats
 import numpy as np
 import json
 from datetime import datetime
-from layout import aplicar_layout  # Importa el decorador
+from layout import aplicar_layout,aplicar_layout_con_sidebar  # Importa el decorador
 from utils.custom_style import load_css
+from utils.require_auth import require_auth
 from bokeh.models import HoverTool
 
+# Verifica que el usuario esté autenticado o ingresado como visitante
+if not (st.session_state.get("logged_in", False) or st.session_state.get("visitor", False)):
+    st.error("Acceso restringido. Debes iniciar sesión o ingresar como visitante para acceder a esta página.")
+    st.stop()  # Detiene la ejecución del resto del script
 
 # Carga de configuración
 st.set_page_config(layout="wide", page_title="PM40")
@@ -22,6 +27,7 @@ with open("config.json", "r") as config_file:
     
 file_url = config["file_url"]
 tickers = config["tickers"]
+
 
 # Función para agregar tarjetas personalizadas
 def agregar_tarjetas():
@@ -64,7 +70,14 @@ def agregar_tarjetas():
             </div>
         """, unsafe_allow_html=True)
 
-@aplicar_layout  # Aplica el decorador para agregar el layout
+
+if st.session_state.get("visitor", False) or st.session_state.get("logged_in",False):
+    layout_decorator = aplicar_layout_con_sidebar()
+else:
+    layout_decorator = aplicar_layout()
+
+@require_auth
+@layout_decorator  # Aplica el decorador para agregar el layout
 def mostrar_pm40():
     agregar_tarjetas()
     @st.cache_data
