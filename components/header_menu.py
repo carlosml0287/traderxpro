@@ -8,7 +8,7 @@ def generar_header():
         <style>
         .stVerticalBlock .stHorizontalBlock {
            position: fixed;
-           top: 100px;
+           top: 0;
            padding:10px 20px;
            display:flex;
            z-index:1000;
@@ -36,7 +36,6 @@ def generar_header():
         """,
         unsafe_allow_html=True
     )
-    st.text("Nuevamente por aqui")
     with st.container():
         col_logo, col_buttons = st.columns([1, 2])
         with col_logo:
@@ -49,24 +48,24 @@ def generar_header():
             
             if logged_in:
                 if st.button("Cerrar sesión", key="logout"):
-                    st.text("se esta cerrando sesion")
                     st.session_state.logged_in = False
+                    st.session_state.visitor=False
+                    st.session_state.current_page=False
+                    #Redirigimos la pagina al incio
+                    cambiar_pagina("home")
+                    st.rerun()
             elif visitor:
                 # Solo se muestra el botón de Login en modo visitante
-                if st.button("Login", key="to_login", on_click=cambiar_pagina, args=("login",)):
-                    st.text("user")
+                st.button("Login", key="to_login", on_click=cambiar_pagina, args=("login",))
             else:
                 col_a, col_b = st.columns(2)
                 with col_a:
                     # Solo mostramos el botón de login si no estamos ya en la página de login
                     if current_page != "login":
                         if st.button("Iniciar Sesion", key="login_btn", on_click=cambiar_pagina, args=("login",)):
-                            st.session_state.logged_in = True
                             st.text("Regresando del apilamiento a fin de iniciar sesion - button")
                 with col_b:
-                    st.session_state.visitor = True
                     if st.button("Ingresar como Visitante", key="visitor_btn", on_click=cambiar_pagina, args=("visitor",)):
-                        st.session_state.visitor = True
                         st.text("Regresando del apilamiento visitante")
 
     st.text(f"Logged: {logged_in} | visitor: {visitor} | current_page: {current_page}")
