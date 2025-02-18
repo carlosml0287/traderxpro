@@ -1,14 +1,7 @@
 import streamlit as st
+from utils.cambia_pagina import cambiar_pagina
 
-def route(nav):
-    # Intentar obtener el parámetro 'page' de la URL
-    # Intentar obtener el parámetro 'page' de la URL usando st.query_params (nueva API)
-    query_params = st.query_params
-    if "page" in query_params:
-        st.session_state.current_page = query_params["page"][0]
-        st.text(f"RUTA: {query_params['page'][0]}")
-    
-    st.text(f"RUTA: {query_params}")
+def route():
     # Inicializar variables de sesión (si aún no existen)
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
@@ -21,17 +14,15 @@ def route(nav):
 
     if current_page == "login":
         from pages.login import app as login_app
-        login_app(nav)
-        
+        login_app()
     elif current_page == "home":
         from pages.home import app as home_app
         home_app()
     elif current_page == "visitor":
         from pages.visitor import app as visitor_app
-        visitor_app(nav)
+        visitor_app()
     elif current_page == "signup":
         from pages.signup import app as signup_app
-        signup_app(nav)
+        st.text("INGRESO A SIGNUP")
     else:
         st.write("Página no encontrada.")
-

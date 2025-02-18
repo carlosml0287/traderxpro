@@ -25,15 +25,6 @@
 }
 
 
-[data-testid="stAppViewContainer"] {
-    position: relative;
-    height: 100vh;
-    width: 100vw;
-   
-    background-size: cover !important;
-}
-
-
 
 /*---- FORMULARIO -----*/
 [data-testid="stForm"]{
@@ -156,7 +147,7 @@
 
 /* Oculta la cabecera de Streamlit si lo deseas */
 .stAppHeader {
-    visibility: none;
+    visibility: hidden;
 }
 
 
