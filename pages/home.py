@@ -1,77 +1,60 @@
 import streamlit as st
-import plotly.express as px
 import pandas as pd
-from utils.custom_style import load_css
-from layout import aplicar_layout,aplicar_layout_con_sidebar
+import plotly.graph_objects as go
+import numpy as np
 
+# Funciones para generar los gráficos (puedes personalizar esto con tus propias estrategias)
+def plot_rsi():
+    # Aquí generas tu gráfico de RSI
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=np.arange(100), y=np.random.rand(100), mode='lines', name='RSI'))
+    return fig
 
-def app():
-     # Selecciona dinámicamente el layout según el estado actual
-    if st.session_state.get("visitor", False) or st.session_state.get("logged_in",False):
-        layout_decorator = aplicar_layout_con_sidebar()
-    else:
-        layout_decorator = aplicar_layout()
-        
-        
-    def render_content():
-        load_css("styles/style.css")
-        st.markdown("""
-                <div class="main-container">
-                    <div class="info-box">
-                        <h3 class="encabezado-h3">Elevate your<br><small> Trading</small><br> Adventure!</h3>
-                        <p>orem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica </p>
-                    </div>
-                <div class="card-container">
-                <div class="card">
-                    <h3>Vela Alcista</h3>
-                    <img src="https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/card1.png">
-                    </div>
-                    <div class="card">
-                        <h3>Vela Bajista</h3>
-                        <img src="https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/card1.png">
-                    </div>
-                    <div class="card">
-                        <h3>Vela Alcista</h3>
-                        <img src="https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/card1.png">
-                    </div>
-                </div>
-                </div>
-                """,unsafe_allow_html=True)
+def plot_moving_average():
+    # Aquí generas tu gráfico de media móvil
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=np.arange(100), y=np.random.rand(100), mode='lines', name='Media Móvil'))
+    return fig
 
+def plot_bollinger_bands():
+    # Aquí generas tu gráfico de bandas de Bollinger
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=np.arange(100), y=np.random.rand(100), mode='lines', name='Bollinger'))
+    return fig
 
-        st.markdown("""
-            <div class="container-outer">
-                <div class="card_">
-                    <div class="col1">
-                        <img src="https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/card1.png" alt="Tendencia Alcista">
-                    </div>
-                    <div class="col2">
-                        <h3 > Tendencia Alcista</h3>
-                        <p>
-                            La tendencia alcista es una condición de mercado en la que los precios suelen subir. Las tendencias alcistas pueden identificarse utilizando medias móviles, líneas de tendencia y niveles de soporte y resistencia. Estas son algunas características clave de una tendencia alcista:
-                            Los máximos de cada vela son superiores a los máximos de las velas anteriores.
-                            Los mínimos de cada vela son superiores a los mínimos de las velas anteriores.
-                            Es probable que la tendencia continúe hasta que los precios rompan por debajo del nivel de soporte importante.
-                        </p>
-                    </div>
-                </div>
-                <div class="card_">
-                    <div class="col1">
-                        <img src="https://raw.githubusercontent.com/LinderCa/assets/refs/heads/main/card1.png" alt="Tendencia Alcista">
-                    </div>
-                    <div class="col2">
-                        <h3 > Tendencia Alcista</h3>
-                        <p>
-                            La tendencia alcista es una condición de mercado en la que los precios suelen subir. Las tendencias alcistas pueden identificarse utilizando medias móviles, líneas de tendencia y niveles de soporte y resistencia. Estas son algunas características clave de una tendencia alcista:
-                            Los máximos de cada vela son superiores a los máximos de las velas anteriores.
-                            Los mínimos de cada vela son superiores a los mínimos de las velas anteriores.
-                            Es probable que la tendencia continúe hasta que los precios rompan por debajo del nivel de soporte importante.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+def plot_fuerte_caida():
+    # Aquí generas tu gráfico de caída fuerte
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=np.arange(100), y=np.random.rand(100), mode='lines', name='Caída Fuerte'))
+    return fig
 
-    # Aplica el layout (header y/o sidebar) y renderiza el contenido
-    decorated_render = layout_decorator(render_content)
-    decorated_render()
+# Diccionario de estrategias
+estrategias = {
+    'RSI': plot_rsi,
+    'Media Móvil': plot_moving_average,
+    'Bollinger Bands': plot_bollinger_bands,
+    'Caída Fuerte': plot_fuerte_caida
+}
+
+# Crear una grilla o dataframe con las estrategias
+df_estrategias = pd.DataFrame({
+    'Estrategia': ['RSI', 'Media Móvil', 'Bollinger Bands', 'Caída Fuerte'],
+    'Descripción': [
+        'Índice de Fuerza Relativa.',
+        'Media Móvil Simple.',
+        'Bandas de Bollinger.',
+        'Identificación de caídas fuertes.'
+    ]
+})
+
+# Mostrar la grilla de estrategias
+st.title("Análisis de Estrategias de Trading")
+st.dataframe(df_estrategias)
+
+# Seleccionar la estrategia
+seleccionada = st.selectbox("Elige una estrategia", estrategias.keys())
+
+# Mostrar el gráfico de la estrategia seleccionada
+st.subheader(f"Gráfico de {seleccionada}")
+fig = estrategias[seleccionada]()
+st.plotly_chart(fig)
