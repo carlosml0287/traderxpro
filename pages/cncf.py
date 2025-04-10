@@ -16,8 +16,6 @@ import json
 import requests
 from io import StringIO
 
-st.set_page_config(layout="wide", page_title="CNCF")
-
 #Configuracion del json
 #with open("config.json","r") as config_file:
 #    config=json.load(config_file)

@@ -1,12 +1,9 @@
 :root{
-    --primary-color:#1D1D1D; /*rgba(29, 29, 29, 1)    */
-    --secondary-color:#56E990; /*rgba(86, 233, 144, 1)*/
-    --secondary-var1:#45ba73; /*rgba(69, 186, 115, 1)*/
-    --secondary-var2:#348c56; /*rgba(52, 140, 86, 1) */
-    --secondary-var3: #225d3a; /*rgba(34, 93, 58, 1)*/
-    --secondary-var4:#112f1d; /*rgba(17, 47, 29, 1)*/
-    --third-color:#bebebe;
-    --four-color:#fff;
+    --primary-color: #57cc99;
+    --background-color: #001524;
+    --secondayr-background-color: #212529;
+    --text-color: #c7f9cc;
+    --secondary-color:#80ed99;
 }
 
 /* Aseguramos que el contenedor principal ocupe todo el viewport */
@@ -25,387 +22,43 @@
 }
 
 
-
-/*---- FORMULARIO -----*/
-[data-testid="stForm"]{
-    background-color: rgba(17, 47, 29, 0.1);
-    box-shadow: 0px 0px 11px var(--secondary-var3);
-    padding: 10px 50px;
-    width: 60%;
-    margin: 0 auto;
-    max-width: 650px;
-    min-width: 400px;
-}
-
-[data-testid="stWidgetLabel"]{
-    color: var(--third-color);
-}
-
-[data-testid="stWidgetLabel"] p{
-    font-size: 21px;
-    font-weight: 500;
-}
-
-[data-testid="stTextInputRootElement"]{
-    border-radius: 5px;
-    border-color: var(--primary-color);
-    padding-right: 0;
-    box-shadow: 0px 0px 1.9px var(--third-color);
-
-} 
-
-[data-testid="stTextInputRootElement"] button{
-    color: var(--five-color);
-} 
-
-[data-testid="stTextInputRootElement"] input{
-    padding-left: 20px;
-    color: var(--secondary-color);
-    caret-color: var(--secondary-color);
-    background-color: rgba(34, 93, 58, 0.2);
-
-} 
-
-/*- BOTON FORMULARIO*/
-[data-testid="stBaseButton-secondaryFormSubmit"]{
-    background-color: var(--secondary-color);
-    color: var(--primary-color)
-}
-
-[data-testid="stBaseButton-secondaryFormSubmit"] p{
+/*ESTILOS */
+.title_header{
+    font-size: 200px;
+    text-align: center;
     font-weight: bold;
-    font-size: 17px;
+    margin-bottom: 15px;
+    white-space: pre-line;
+    padding: 0 100px;
 }
 
-
-[data-testid="stBaseButton-secondaryFormSubmit"]:hover{
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    border-color: var(--secondary-color);
-}
-.btn-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    padding-bottom: 30px;
+.title_header > span{
+    color: var(--primary-color);
 }
 
-
-/* Estilo del botón de Google */
-.google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 200px;  /* Ancho del botón */
-    height: 50px;  /* Altura del botón */
-    background-color: transparent;
-    color: #333;
-    font-size: 16px;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 25px; /* Bordes redondeados */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 2px solid var(--six-color);
-}
-
-/* Ícono de Google dentro del botón */
-.google-btn img {
-    margin-right: 10px; /* Espaciado a la derecha */
-    width: 24px;
-    height: 24px;
-}
-
-/* Efecto hover */
-.google-btn:hover {
-    background-color: rgba(52, 140, 86, 0.5);
-    color: white;
-    box-shadow: 0px 6px 10px var(--secondary-var1);
-}
-
-/* Efecto de presionar */
-.google-btn:active {
-    transform: scale(0.95);
-}
-
-
-
-
-/*------ ENCABEZADOS ------------------*/
-.st-emotion-cache-1bobo2k  h3{
-    color: var(--five-color);
-    font-size: 40px;
-}
-
-
-.sidebar .stSelectbox div[data-baseweb="select"] {
-    border: 2px solid #007bff; /* Cambiar el borde del selectbox */
-    border-radius: 5px; /* Bordes redondeados */
-    padding: 5px;
-}
-
-/* Oculta la cabecera de Streamlit si lo deseas */
-.stAppHeader {
-    visibility: hidden;
-}
-
-
-
-
-/*---RESPONSIVO---*/
-@media (max-width:480px) {
-    .st-emotion-cache-1bobo2k  h3{
-        text-align: center;
-    }
-}
-
-
-
-
-/*---------SIDER BAR ----------------*/
-[data-testid="stSidebarContent"]{
-    background: linear-gradient(to bottom, var(--secondary-var4) 5%, #1D1D1D 45%, #1D1D1D 50%)
-
-}
-
-/* Estilo del título principal */
-.sidebar-title {
+.p_descripcion{
     font-size: 30px;
-    font-weight: bold;
     text-align: center;
-    padding: 0px;
-    margin-bottom: 20px;
-    position: relative;
-    top: -30px;
-    color: var(--third-color);
+    margin-bottom:20px;
 }
 
-
-[data-testid="stBaseButton-secondary"]{
-    background-color: var(--primary-color);
-    border-color: var(--four-color);
-    color: var(--four-color);
-}
-
-.divider {
-    border-bottom: 2px solid #444;
-    margin: 15px 0;
-}
-
-
-
-
-/*------------ SELECT BOX ---------*/
-.stSelectbox{
-    height: min-content;
-}
-
-.stSelectbox [data-testid="stWidgetLabel"]{
-    min-height: 0;
-}
-
-.stSelectbox [data-baseweb="select"]{
-    border: 0.1px solid var(--third-color);
-    border-radius: 10px;
-}
-
-
-
-
-
-
-
-.info-box h3{
+.stButton > button{
+    width: 250px;
+    height: 70px;
     font-size: 50px;
+    border: 2px solid #cccccc;
+    border-radius: 20px ;
+    background-color: transparent;
+    margin: 5px 0px;
+    display: flex;
+    margin-left: 50px;
 }
 
-.info-box h3 small{
-    font-size: 50px;
+.stButton > button:hover{
     color: var(--secondary-color);
+    background-color: transparent;
 }
 
-.info-box p{
-    color: var(--third-color);
-    font-size: 20px;
-    padding-right: 22px;
-}
-
-
-.main-container {
-    height: 60vh;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    gap: 20px;
-    padding: 10px;
-    margin-bottom: 300px;
-}
-
-.info-box {
-    flex: 1;
-    padding: 20px;
-    border-radius: 15px;
-    color: white;
-    font-size: 18px;
-    width: 100%;
-    height: 100%;
-}
-
-.card-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex: 1.5;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 5px 5px 20px rgba(0,0,0,0.2);
-    padding: 10px 20px;
-}
-
-.card {
-    width: 33%;
-    height: 320px;
-    border-radius: 10px;
-    box-shadow: 5px 5px 20px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* Efecto de hover: la tarjeta se agranda y la sombra se intensifica */
-.card:hover {
-    transform: scale(1.2);
-    box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
-}
-
-/* Animación de movimiento (flotado) */
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
-/* Asignación de animación a cada card dentro de .card-container */
-.card-container .card:nth-child(1) { 
-    animation: float 3s infinite ease-in-out; 
-}
-.card-container .card:nth-child(2) { 
-    animation: float 3s infinite ease-in-out 1s; 
-}
-.card-container .card:nth-child(3) { 
-    animation: float 3s infinite ease-in-out 2s; 
-}
-
-/* =========================== */
-/* Media queries para responsividad */
-/* =========================== */
-
-/* Para pantallas medianas (tablets, max-width: 768px) */
-@media screen and (max-width: 1299px) {
-    .main-container {
-        flex-direction: column;
-        height: auto;
-    }
-    .info-box {
-        width: 90%;
-        margin-bottom: 20px;
-        height: auto;
-    }
-    .card-container {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        background-color: transparent; /* Opcional */
-    }
-    .card {
-        width: 200px;
-        height: 250px;
-    }
-    
-    /* Ocultar la tercera card en tablets */
-    .card-container .card:nth-child(3) {
-        display: none;
-    }
-}
-
-/* Para pantallas pequeñas (móviles, max-width: 480px) */
-@media screen and (max-width: 480px) {
-    .main-container {
-        padding: 5px;
-        gap: 10px;
-    }
-    .info-box {
-        font-size: 16px;
-        padding: 10px;
-    }
-    .card {
-        width: 160px;
-        height: 220px;
-        font-size: 14px;
-    }
-    
-    /* Ocultar la segunda y tercera card en móviles */
-    .card-container .card:nth-child(2),
-    .card-container .card:nth-child(3) {
-        display: none;
-    }
-}
-
-
-
-.container-outer{
-    display: flex;
-    flex-direction: column;
-    padding: 25px 0;
-}
-
-.container-outer .card_ {
-    box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    height: 350px;
-    background-color: var(--primary-color);
-    align-items: center;
-    justify-content: space-between;
-}
-
-
-.card_ .col1 {
-    flex: 1;
-    max-width: 30%;
-    text-align: center;
-}
-.card_ .col2 {
-    flex: 2;
-    max-width: 60%;
-    text-align: left;
-    padding-left: 20px;
-}
-.card_ img {
-    width: 100%;
-    max-width: 150px;
-    border-radius: 8px;
-    height: 100%;
-    object-fit: contain;
-}
-
-.card_ .col2 h3{
-    color: var(--secondary-color);
-    font-size: 40px;
-}
-
-.card_ .col2 p{
-    color: var(--third-color);
+.stButton > button p{
     font-size: 20px;
 }

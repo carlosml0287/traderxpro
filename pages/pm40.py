@@ -8,18 +8,11 @@ from scipy import stats
 import numpy as np
 import json
 from datetime import datetime
-from layout import aplicar_layout,aplicar_layout_con_sidebar  # Importa el decorador
 from utils.custom_style import load_css
-from utils.require_auth import require_auth
 from bokeh.models import HoverTool
 
-# Verifica que el usuario esté autenticado o ingresado como visitante
-if not (st.session_state.get("logged_in", False) or st.session_state.get("visitor", False)):
-    st.error("Acceso restringido. Debes iniciar sesión o ingresar como visitante para acceder a esta página.")
-    st.stop()  # Detiene la ejecución del resto del script
 
 # Carga de configuración
-st.set_page_config(layout="wide", page_title="PM40")
 load_css("styles/style.css")
 
 with open("config.json", "r") as config_file:
@@ -29,57 +22,10 @@ file_url = config["file_url"]
 tickers = config["tickers"]
 
 
-# Función para agregar tarjetas personalizadas
-def agregar_tarjetas():
-    with st.container():
-        st.markdown("<h2 style="">Promedio Movil</h2>", unsafe_allow_html=True)
-        # Creamos 3 columnas
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.markdown("""
-                <div class="card_promedio">
-                    <h3>Tarjeta 1</h3>
-                    <p>Contenido de la tarjeta 1. Información básica.</p>
-                </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-                <div class="card_promedio">
-                    <h3>Tarjeta 2</h3>
-                    <p>Contenido de la tarjeta 2. Información intermedia.</p>
-                </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown("""
-                <div class="card_promedio">
-                    <h3>Tarjeta 3</h3>
-                    <p>Contenido de la tarjeta 3. Detalles adicionales.</p>
-                </div>
-            """, unsafe_allow_html=True)
-
-    # Segundo contenedor: Información adicional que ocupa todo el ancho
-    with st.container():
-        st.markdown("<h2>Descripcion</h2>", unsafe_allow_html=True)
-        st.markdown("""
-            <div class="info-box">
-                <p>Aquí se muestra información adicional que ocupa todo el ancho del contenedor. 
-                Puedes incluir gráficos, tablas, textos detallados o cualquier otro contenido relevante.</p>
-            </div>
-        """, unsafe_allow_html=True)
-
-
-if st.session_state.get("visitor", False) or st.session_state.get("logged_in",False):
-    layout_decorator = aplicar_layout_con_sidebar()
-else:
-    layout_decorator = aplicar_layout()
-
-@require_auth
-@layout_decorator  # Aplica el decorador para agregar el layout
 def mostrar_pm40():
-    agregar_tarjetas()
+    st.title("HOLA SOY PM40")
+    """
+    #agregar_tarjetas()
     @st.cache_data
     def load_dataset3():
         response = requests.get(file_url)
@@ -225,6 +171,6 @@ def mostrar_pm40():
 
     # Mostrar el DataFrame en una tabla
     st.dataframe(df)
+    """
 
-# Llamar la función decorada
 mostrar_pm40()
