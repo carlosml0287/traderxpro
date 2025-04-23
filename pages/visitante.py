@@ -3,9 +3,10 @@ import pandas as pd
 import time
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import plotly.express as px
-from bokeh.plotting import figure, show, column
-from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, CategoricalAxis,FactorRange, Span
-#from components.diagramar import tipo_vela
+
+from utils.set_get_json import set_status,get_status
+from utils.graficar import graficar
+from utils.load_data import load_data
 
 def app_visitante():
     # Pantalla de carga
@@ -87,30 +88,50 @@ def app_visitante():
         tickers = sorted(df_stats["Ticker"].unique())
         tickers.insert(0,"Todos")
         
-        if "ticker_seleccionado" not in st.session_state:
-            st.session_state["ticker_seleccionado"]="Todos"
+        #PRUEBA
+        #if "ticker_anterior" not in st.session_state:
+        #    st.session_state["ticker_anterior"] = None
             
-        st.write(f"El valor de ticker_seleccionado es: {st.session_state['ticker_seleccionado']}")
-        ticker_input = st.selectbox("Selecciona un ticker:", tickers, key="ticker_selector")
-        st.session_state["ticker_seleccionado"] = ticker_input
+        #ticker_actual = st.selectbox("Selecciona un ticker", tickers,key="ticker_selector")
+        #st.write(f"->El valor de ticker actual es: {ticker_actual}")
         
-        st.write(f"El valor de ticker_seleccionado es: {st.session_state['ticker_seleccionado']}")
-        ticker_select= st.session_state["ticker_seleccionado"]
-        st.write(f"->{ticker_select}")
-    
-        if ticker_select=="Todos":
+        #hubo_interaccion = ticker_actual != st.session_state["ticker_anterior"]
+        #st.write(f"El valor de hubo_interaccion es: {hubo_interaccion}")
+        #st.write(f"->el valor de status_row es: {get_status('status_row')}")
+
+        #if hubo_interaccion:
+        #    st.success(f"✅ Se hizo clic y seleccionaste: {ticker_actual}")
+        #    ticker_current=ticker_actual
+        #    set_status("status_row", "None")
+        #else:
+        #    st.info("ℹ️ No se ha cambiado la selección aún")
+        #    st.write(f"->El valor de status_row es: {get_status('status_row')}")
+        #    ticker_current=get_status("status_row")
+
+        # Actualizar valor anterior
+        #st.session_state["ticker_anterior"] = ticker_current
+        
+        ticker_current=st.selectbox("Selecciona un ticker", tickers,key="ticker_selector")
+        #RESERVA DE ESPACIO
+        kpi_holder=st.empty()
+        #Mostramos lo inicial
+        df_inicial=df_stats.groupby("Ticker").mean(numeric_only=True).reset_index()
+        
+        with kpi_holder:
+            mostrar_kpis_por_ticker(df_inicial, promedio=True,fecha=dict_fecha)
+        
+        if ticker_current=="Todos":
             dfs_trades=[]
             for ticker, url in trade_urls.items():
                 df = pd.read_csv(url)
                 df["Ticker"] = ticker
                 dfs_trades.append(df)
             df_trades = pd.concat(dfs_trades, ignore_index=True)
-            mostrar_kpis_por_ticker(df_stats.groupby("Ticker").mean(numeric_only=True).reset_index(), promedio=True,fecha=dict_fecha)
+            #mostrar_kpis_por_ticker(df_stats.groupby("Ticker").mean(numeric_only=True).reset_index(), promedio=True,fecha=dict_fecha)
         else:
-            # Solo el archivo del ticker seleccionado
-            df_trades = pd.read_csv(trade_urls[ticker_select])
-            df_trades["Ticker"] = ticker_select
-            mostrar_kpis_por_ticker(df_stats[df_stats["Ticker"] == ticker_select],promedio=False,fecha=dict_fecha)
+            df_trades = pd.read_csv(trade_urls[ticker_current])
+            df_trades["Ticker"] = ticker_current
+            #mostrar_kpis_por_ticker(df_stats[df_stats["Ticker"] == ticker_current],promedio=False,fecha=dict_fecha)
 
         # Preprocesar columnas para grilla
         columnas = ["Ticker", "EntryTime", "ExitTime", "EntryPrice","ExitPrice", "Duration","Size","EntryBar","ExitBar"]
@@ -134,6 +155,9 @@ def app_visitante():
         )
 
         selected = grid_response["selected_rows"]
+        st.write("--- SELECTED DEBUG ---")
+        st.write(f"selected: {selected}")
+        st.write(f"type(selected): {type(selected)}")
 
         #FUNCION PROBADA
         def tipo_vela():
@@ -142,136 +166,40 @@ def app_visitante():
             df_casos["BarColor"] = df_casos[["Open","Close"]].apply(lambda o: "red" if o.Open>o.Close else "green", axis=1)
             return df_casos
 
-        if selected is not None and not selected.empty:
-            titulo = "Gráfico"
-            st.markdown(f'<h3 style="color: #57cc99; text-align: right;"> {titulo}</h3>', unsafe_allow_html=True)
-            df=tipo_vela()
-            fila = selected.iloc[0] 
-            ticker_seleccionado = fila["Ticker"]
-            fecha_open_select=fila["EntryTime"]
-            df_row = df.query("companyName == @ticker_seleccionado and datetime==@fecha_open_select")
-            #Hallamos el numero de caso
-            caso=df_row.iloc[0]['caso']
-            st.success(f"Fila seleccionada: {ticker_seleccionado} | Fecha de entrada: {fecha_open_select}")
-            st.write(f"\n\t->Ticker de grilla: {ticker_seleccionado}")
-            st.session_state["ticker_seleccionado"]=ticker_seleccionado
-            st.write(f"\t->Ticker de grilla actual: {st.session_state['ticker_seleccionado']}")
-            dfpl = df.query("companyName == @ticker_seleccionado and caso == @caso")
-            st.write(f"ticker seleccioandod {ticker_seleccionado}")
-            #DIbujar
-            dfpl.reset_index(drop=True, inplace=True)
-            inc = dfpl.query("Close>Open")
-            dec = dfpl.query("Open>Close")
-            TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+        # 6) Cuando el usuario cambie el selectbox, **vuelve a pintar solo el placeholder**
+        if ticker_current != "Todos":
+            df_sub = df_stats[df_stats["Ticker"] == ticker_current]
+            with kpi_holder:
+                mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha)
 
-            p = figure(width=1000, height=500,
-                    title="RCB",
-                    background_fill_color="#efefef",
-                    tooltips=[("Index", "@index"),("datetime", "@Datetime_str"), ("Open", "@Open"), ("High","@High"), ("Low","@Low"), ("Close","@Close"), 
-                            ("cdlengulfing","@cdlengulfing"), 
-                            ("cdlhammer","@cdlhammer"), 
-                            ("cdlmorningstar","@cdlmorningstar"), 
-                            ("cdlpiercing","@cdlpiercing"), 
-                            ("cdlclosingmarubozu","@cdlclosingmarubozu"), 
-                            ("cdlmarubozu","@cdlmarubozu"), 
-                            ("cdl3whitesoldiers","@cdl3whitesoldiers"), 
-                            ("cdlharami","@cdlharami"), 
-                            ("cdlharamicross","@cdlharamicross"), 
-                            ("cdlinvertdhammer","@cdlinvertdhammer"), 
-                            ("cdlladderbottom","@cdlladderbottom")]
-                    )
-            p.xaxis.major_label_orientation = 0.8 # radians
-            p.x_range.range_padding = 0.05
-            p.xaxis.axis_line_width = 4
-            p.xaxis.major_label_overrides = {
-                i: date.strftime('%b %d %T') for i, date in zip(dfpl.index, dfpl["datetime"])
-            }
-
-            p.segment("index", "High", "index","Low",  color="black", line_width=1, source=dfpl)
-            p.vbar(    
-                x="index",
-                width=0.6,
-                bottom="Open",
-                top="Close",
-                fill_color="red",
-                line_color="red",    
-                source=dec   
-            )
-            p.vbar(    
-                x="index",
-                width=0.6,
-                bottom="Open",
-                top="Close",
-                fill_color="green",
-                line_color="green", 
-                source=inc   
-            )
-            p.line(
-                x="index", 
-                y="SMA20", 
-                color="#ffb81c",
-                legend_label="SMA20",
-                source=dfpl)
-            p.line(
-                x="index", 
-                y="SMA40", 
-                color="red",
-                legend_label="SMA40",
-                source=dfpl)
-            
-            slopeH=dfpl["sl_highs"].iloc[0]
-
-            r_sq_h=dfpl["r_sq_h"].iloc[0]
-
-            val = str(slopeH) + "," + str(r_sq_h)
-            
-            p.scatter(x="index", y="pivotLow", marker="circle", size=5,
-                    line_color="navy", fill_color="red", alpha=0.5, legend_label="Cambio Tendencia Alcista", source=dfpl)
-            p.scatter(x="index", y="pivotHigh", marker="circle", size=5,
-                    line_color="navy", fill_color="green", alpha=0.5, legend_label="Cambio Tendencia Bajista", source=dfpl)
-            p.scatter(x="index", y="High", marker="square_pin", size=8,
-                    line_color="navy", fill_color="black", alpha=0.5, legend_label=val , source=dfpl[(dfpl.trendH==1)])
-            p.scatter(x="index", y="breakpointpos", marker="triangle", size=12,
-                    line_color="navy", fill_color="black", alpha=0.5, legend_label="Ruptura del Canal", source=dfpl)
-            inicio = (dfpl[(dfpl.ind_posicion==0)].index).tolist()[0]
-            vline=Span(location=inicio,dimension='height', line_color='grey',line_width=0.8, line_dash_offset= 0, line_dash='dashed', name="hola esto es una prueba", level='annotation', tags= ['square'])
-
-
-            p.line(
-            x="index",
-            y="trendcurrhigh",
-            color="purple",
-            legend_label="Slope High",
-            source=dfpl)
-            
-            p.yaxis[0].formatter = NumeralTickFormatter(format="$0.00")
-            p.xaxis.axis_label = "Fecha"
-            p.yaxis.axis_label = "Precio"
-            p.legend.location="top_left"
-            p.legend.click_policy="hide"
-            p.renderers.extend([vline])
-            volume = figure(x_axis_type="datetime", height=120, width=1000, tooltips = [("Volume", "@Volume"),("datetime", "@Datetime_str")],background_fill_color="#efefef")
-            volume.x_range.range_padding = 0.05
-            volume.vbar(    
-                x="index",
-                width=0.6,
-                top="Volume",
-                fill_color="BarColor",
-                line_color="BarColor", 
-                source=dfpl   
-            )
-
-
-            volume.yaxis.axis_label="Volume"
-            volume.xaxis.major_label_overrides = {
-                i: date.strftime('%b %d %T') for i, date in zip(dfpl.index, dfpl["datetime"])
-            }
-            volume.yaxis[0].formatter = NumeralTickFormatter(format="0,0")
-            fig = column(children=[p, volume], sizing_mode="scale_width")
-            st.bokeh_chart(fig, use_container_width=True)
-
+        if selected is not None:
+            st.write(f"len(selected): {len(selected)}")
+            if len(selected) > 0:
+                titulo = "Gráfico"
+                st.markdown(f'<h3 style="color: #57cc99; text-align: right;"> {titulo}</h3>', unsafe_allow_html=True)
+                df=tipo_vela()
+                ticker=selected.iloc[0]['Ticker']
+                fecha_open_select=selected.iloc[0]['EntryTime']
+                df_row = df.query("companyName == @ticker and datetime==@fecha_open_select")
+                caso=df_row.iloc[0]['caso']
+                st.success(f"Fila seleccionada: {ticker} | Fecha de entrada: {fecha_open_select}")
+                dfpl = df.query("companyName == @ticker and caso == @caso")
+                df_sub = df_stats[df_stats["Ticker"] == ticker]
+                #CAMBIAR EL ESTADO DE JSON
+                #set_status("status_row",ticker)
+                #set_status("is_input","false")
+                
+                with kpi_holder:
+                    mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha)
+                
+                graficar(dfpl)
+            else:
+                st.warning("⚠️ No hay ninguna fila seleccionada.")
         else:
-            st.warning("⚠️ No hay ninguna fila seleccionada.")
+            st.warning("⚠️ 'selected' es None.")
+            set_status("status_row","None")
+            set_status("is_input","true")
+
 
 
     except Exception as e:
