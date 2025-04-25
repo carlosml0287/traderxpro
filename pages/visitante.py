@@ -3,7 +3,7 @@ import pandas as pd
 import time
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 from utils.graficar import graficar
-from utils.load_data import load_data
+from utils.kpis_mean import mean_duration,mean_price
 
 def app_visitante():
     # Pantalla de carga
@@ -104,14 +104,15 @@ def app_visitante():
         
         data = df_trades[columnas].copy()
         data.sort_values("EntryTime", ascending=False, inplace=True)
-        data_duraction=data['Duration']
+        data_mean=data[['Duration','EntryPrice','ExitPrice']]
+        
         #RESERVA DE ESPACIO
         kpi_holder=st.empty()
         #Mostramos lo inicial
         df_inicial=df_stats.groupby("Ticker").mean(numeric_only=True).reset_index()
         
         with kpi_holder:
-            mostrar_kpis_por_ticker(df_inicial, promedio=True,fecha=dict_fecha,data=data_duraction)
+            mostrar_kpis_por_ticker(df_inicial, promedio=True,fecha=dict_fecha,data=data_mean)
         
         # Mostrar grilla interactiva
         #st.markdown("## 📋 Trades del Ticker Seleccionado")
@@ -142,7 +143,7 @@ def app_visitante():
         # 6) Cuando el usuario cambie el selectbox, **vuelve a pintar solo el placeholder**
         if ticker_current != "Todos":
             df_sub = df_stats[df_stats["Ticker"] == ticker_current]
-            data_for_ticker=data['Duration']
+            data_for_ticker=data[['Duration','EntryPrice','ExitPrice']]
             with kpi_holder:
                 mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha,data=data_for_ticker)
 
@@ -161,9 +162,9 @@ def app_visitante():
                 df_sub = df_stats[df_stats["Ticker"] == ticker]
                 
                 columna_for_ticker=data.query("Ticker== @ticker")
-                column_ticker_duraction=columna_for_ticker['Duration']
+                column_ticker_mean=columna_for_ticker[['Duration','EntryPrice','ExitPrice']]
                 with kpi_holder:
-                    mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha,data=column_ticker_duraction)
+                    mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha,data=column_ticker_mean)
                 graficar(dfpl)
             else:
                 st.warning("⚠️ No hay ninguna fila seleccionada.")
@@ -174,20 +175,9 @@ def app_visitante():
         st.error(f"❌ Error al cargar datos: {e}")
 
 def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={},data=None):
-    duration=pd.to_timedelta(data)
-    media=duration.mean()
-    std=duration.std()
-    
-    # 3. Filtrar eliminando los valores muy extremos (por ejemplo, fuera de ±2 std)
-    serie_filtrada = (duration > media - 2 * std) & (duration < media + 2 * std)
-    
-    # 4. Obtener la nueva media sin outliers
-    media_filtrada = duration[serie_filtrada].mean()
-    total_second=media_filtrada.total_seconds() 
-    print(f"Media nueva: {media_filtrada}")
-    days=int(total_second//86400)
-    hours=int((total_second%86400)//3600)
-    minutes=int((total_second%3600)//60)
+    media_duracion=mean_duration(data['Duration'])
+    media_precio=mean_price((data['ExitPrice']-data['EntryPrice'])/data['EntryPrice'])
+   
     start = fecha['Start'].strftime("%d/%m/%Y %H:%M")
     end = fecha['End'].strftime("%d/%m/%Y %H:%M")
     if promedio:
@@ -331,8 +321,13 @@ def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={},data=None):
             </div>
             <div class="kpi-card">
                 <div class="tooltip">Duracion esperada</div>
-                <div class="kpi-title">⟳ Duracion</div>
-                <div class="kpi-value">{days} días {hours:02d}:{minutes:02d}</div>
+                <div class="kpi-title">⏱ Duracion</div>
+                <div class="kpi-value">{media_duracion}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="tooltip">Retorno porcentual promedio por trade</div>
+                <div class="kpi-title">% Promedio por Operación</div>
+                <div class="kpi-value">{round(media_precio,2)*100}%</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
