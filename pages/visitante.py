@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 import time
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
-import plotly.express as px
-
-from utils.set_get_json import set_status,get_status
 from utils.graficar import graficar
 from utils.load_data import load_data
 
@@ -79,7 +76,7 @@ def app_visitante():
     """, unsafe_allow_html=True)
     try:
         df_casos=pd.read_csv(url_casos,sep='\t')
-        df_stats = pd.read_csv(url_stats)
+        df_stats = pd.read_csv(url_stats)   
         df_stats["Start"]=pd.to_datetime(df_stats["Start"])
         df_stats["End"]=pd.to_datetime(df_stats["End"])
         dict_fecha={'Start':df_stats["Start"].loc[0],'End':df_stats["End"].loc[0]}
@@ -87,38 +84,8 @@ def app_visitante():
         # Mostrar métricas por ticker con selectbox
         tickers = sorted(df_stats["Ticker"].unique())
         tickers.insert(0,"Todos")
-        
-        #PRUEBA
-        #if "ticker_anterior" not in st.session_state:
-        #    st.session_state["ticker_anterior"] = None
-            
-        #ticker_actual = st.selectbox("Selecciona un ticker", tickers,key="ticker_selector")
-        #st.write(f"->El valor de ticker actual es: {ticker_actual}")
-        
-        #hubo_interaccion = ticker_actual != st.session_state["ticker_anterior"]
-        #st.write(f"El valor de hubo_interaccion es: {hubo_interaccion}")
-        #st.write(f"->el valor de status_row es: {get_status('status_row')}")
-
-        #if hubo_interaccion:
-        #    st.success(f"✅ Se hizo clic y seleccionaste: {ticker_actual}")
-        #    ticker_current=ticker_actual
-        #    set_status("status_row", "None")
-        #else:
-        #    st.info("ℹ️ No se ha cambiado la selección aún")
-        #    st.write(f"->El valor de status_row es: {get_status('status_row')}")
-        #    ticker_current=get_status("status_row")
-
-        # Actualizar valor anterior
-        #st.session_state["ticker_anterior"] = ticker_current
-        
         ticker_current=st.selectbox("Selecciona un ticker", tickers,key="ticker_selector")
-        #RESERVA DE ESPACIO
-        kpi_holder=st.empty()
-        #Mostramos lo inicial
-        df_inicial=df_stats.groupby("Ticker").mean(numeric_only=True).reset_index()
         
-        with kpi_holder:
-            mostrar_kpis_por_ticker(df_inicial, promedio=True,fecha=dict_fecha)
         
         if ticker_current=="Todos":
             dfs_trades=[]
@@ -127,22 +94,31 @@ def app_visitante():
                 df["Ticker"] = ticker
                 dfs_trades.append(df)
             df_trades = pd.concat(dfs_trades, ignore_index=True)
-            #mostrar_kpis_por_ticker(df_stats.groupby("Ticker").mean(numeric_only=True).reset_index(), promedio=True,fecha=dict_fecha)
         else:
             df_trades = pd.read_csv(trade_urls[ticker_current])
             df_trades["Ticker"] = ticker_current
-            #mostrar_kpis_por_ticker(df_stats[df_stats["Ticker"] == ticker_current],promedio=False,fecha=dict_fecha)
 
         # Preprocesar columnas para grilla
-        columnas = ["Ticker", "EntryTime", "ExitTime", "EntryPrice","ExitPrice", "Duration","Size","EntryBar","ExitBar"]
+        #columnas = ["Ticker", "EntryTime", "ExitTime", "EntryPrice","ExitPrice", "Duration","Size","EntryBar","ExitBar"]
+        columnas = ["Ticker", "EntryTime", "ExitTime","Duration", "EntryPrice","ExitPrice"]
+        
         data = df_trades[columnas].copy()
-
         data.sort_values("EntryTime", ascending=False, inplace=True)
-
+        data_duraction=data['Duration']
+        #RESERVA DE ESPACIO
+        kpi_holder=st.empty()
+        #Mostramos lo inicial
+        df_inicial=df_stats.groupby("Ticker").mean(numeric_only=True).reset_index()
+        
+        with kpi_holder:
+            mostrar_kpis_por_ticker(df_inicial, promedio=True,fecha=dict_fecha,data=data_duraction)
+        
         # Mostrar grilla interactiva
         #st.markdown("## 📋 Trades del Ticker Seleccionado")
         gb = GridOptionsBuilder.from_dataframe(data)
         gb.configure_selection("single", use_checkbox=True)
+        
+        
         grid_options = gb.build()
 
         grid_response = AgGrid(
@@ -155,9 +131,6 @@ def app_visitante():
         )
 
         selected = grid_response["selected_rows"]
-        st.write("--- SELECTED DEBUG ---")
-        st.write(f"selected: {selected}")
-        st.write(f"type(selected): {type(selected)}")
 
         #FUNCION PROBADA
         def tipo_vela():
@@ -169,50 +142,54 @@ def app_visitante():
         # 6) Cuando el usuario cambie el selectbox, **vuelve a pintar solo el placeholder**
         if ticker_current != "Todos":
             df_sub = df_stats[df_stats["Ticker"] == ticker_current]
+            data_for_ticker=data['Duration']
             with kpi_holder:
-                mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha)
+                mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha,data=data_for_ticker)
 
         if selected is not None:
-            st.write(f"len(selected): {len(selected)}")
             if len(selected) > 0:
                 titulo = "Gráfico"
-                st.markdown(f'<h3 style="color: #57cc99; text-align: right;"> {titulo}</h3>', unsafe_allow_html=True)
+                st.markdown(f'<h3 style="color: #57cc99; text-align: left;">{titulo}</h3>', unsafe_allow_html=True)
                 df=tipo_vela()
                 ticker=selected.iloc[0]['Ticker']
                 fecha_open_select=selected.iloc[0]['EntryTime']
-                df_row = df.query("companyName == @ticker and datetime==@fecha_open_select")
-                caso=df_row.iloc[0]['caso']
-                st.success(f"Fila seleccionada: {ticker} | Fecha de entrada: {fecha_open_select}")
+                df_rows=df.query("companyName == @ticker and datetime==@fecha_open_select")
+                df_row=df_rows.loc[df_rows["isBreakOutIni"]==1] #Elegimos el caso isBreakOutIni
+                caso=df_row.iloc[0,25]
+                st.success(f"Fila seleccionada: {ticker} | Fecha de entrada: {fecha_open_select} | caso {caso}")
                 dfpl = df.query("companyName == @ticker and caso == @caso")
                 df_sub = df_stats[df_stats["Ticker"] == ticker]
-                #CAMBIAR EL ESTADO DE JSON
-                #set_status("status_row",ticker)
-                #set_status("is_input","false")
                 
+                columna_for_ticker=data.query("Ticker== @ticker")
+                column_ticker_duraction=columna_for_ticker['Duration']
                 with kpi_holder:
-                    mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha)
-                
+                    mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha,data=column_ticker_duraction)
                 graficar(dfpl)
             else:
                 st.warning("⚠️ No hay ninguna fila seleccionada.")
-        else:
-            st.warning("⚠️ 'selected' es None.")
-            set_status("status_row","None")
-            set_status("is_input","true")
-
-
+        else: 
+            st.warning("⚠️ No hay ninguna fila seleccionada.")
 
     except Exception as e:
         st.error(f"❌ Error al cargar datos: {e}")
 
-def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={}):
+def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={},data=None):
+    duration=pd.to_timedelta(data)
+    media=duration.mean()
+    std=duration.std()
+    
+    # 3. Filtrar eliminando los valores muy extremos (por ejemplo, fuera de ±2 std)
+    serie_filtrada = (duration > media - 2 * std) & (duration < media + 2 * std)
+    
+    # 4. Obtener la nueva media sin outliers
+    media_filtrada = duration[serie_filtrada].mean()
+    total_second=media_filtrada.total_seconds() 
+    print(f"Media nueva: {media_filtrada}")
+    days=int(total_second//86400)
+    hours=int((total_second%86400)//3600)
+    minutes=int((total_second%3600)//60)
     start = fecha['Start'].strftime("%d/%m/%Y %H:%M")
     end = fecha['End'].strftime("%d/%m/%Y %H:%M")
-    st.markdown(f"""
-        <div style="text-align: right; font-size: 14px; color: #c7f9cc; font-weight: 600;">
-            🕒 Periodo analizado: <strong>{start}</strong> → <strong>{end}</strong>
-        </div>
-    """, unsafe_allow_html=True)
     if promedio:
         row = {}
         row["# Trades"] = df_stats["# Trades"].sum()
@@ -228,8 +205,6 @@ def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={}):
 
     titulo = f"Todos los Ticker" if promedio else row["Ticker"]
 
-    
-
     st.markdown(f"""
         <style>
         .kpi-container {{
@@ -242,6 +217,7 @@ def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={}):
 
         }}
         .kpi-card {{
+            pointer-events: auto;
             position: relative;
             width: 95%;
             height: 140px;
@@ -249,7 +225,7 @@ def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={}):
             box-shadow: 0 4px 10px #212529, 0 0 10px rgb(33, 37, 41); 
             border-radius: 5px;
             padding: 20px;
-            overflow: hidden;
+            overflow: visible;
             transition: transform 0.3s ease-in-out, background 0.3s, color 0.3s;
             color: #c7f9cc;
             display: flex;
@@ -282,41 +258,81 @@ def mostrar_kpis_por_ticker(df_stats, promedio=False, fecha={}):
             color: #c7f9cc;
             z-index: 1;
         }}
+        
+        .kpi-card .tooltip {{
+            visibility: hidden;
+            width: 200px;
+            background-color: #57cc99;
+            color: #001524;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 2;
+            bottom: 70%;
+            right: 0%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0px 0px 10px #000;
+            font-size: 13.5px;
+        }}
+        
+        .kpi-card:hover .tooltip {{
+            visibility: visible;
+            opacity: 1;
+        }}
         </style>
 
-        <h3 style="color: #57cc99; text-align: right;">🎯 {titulo}</h3>
+        <h3 style="color: #57cc99; text-align: left;"> 🗒️ {titulo}</h3>
+        <div style="text-align: left; font-size: 14px; color: #c7f9cc; font-weight: 600;">
+            🕒 Periodo analizado: <strong>{start}</strong> → <strong>{end}</strong>
+        </div>
         <div class="kpi-container">
-            <div class="kpi-card">
+            <div class="kpi-card"  >
+                <div class="tooltip">Cantidad total de operaciones realizadas en el periodo.</div>
                 <div class="kpi-title">∑ # Trades</div>
                 <div class="kpi-value">{int(row["# Trades"])}</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" >
+                <div class="tooltip">Porcentaje de operaciones ganadoras respecto al total.</div>
                 <div class="kpi-title">∆ Win Rate</div>
                 <div class="kpi-value">{round(row["Win Rate [%]"], 2)}%</div>
             </div>
             <div class="kpi-card">
+                <div class="tooltip">La máxima caída de capital desde un punto alto hasta uno bajo.</div>
                 <div class="kpi-title">↓ Max Drawdown</div>
                 <div class="kpi-value">{round(row["Max. Drawdown [%]"], 2)}%</div>
             </div>
             <div class="kpi-card">
+                <div class="tooltip">Retorno total durante el periodo analizado.</div>
                 <div class="kpi-title">↑ Retorno</div>
                 <div class="kpi-value">{round(row["Return [%]"], 2)}%</div>
             </div>
             <div class="kpi-card">
+                <div class="tooltip">Medida de rentabilidad ajustada al riesgo.</div>
                 <div class="kpi-title">ƒ Sharpe Ratio</div>
                 <div class="kpi-value">{round(row["Sharpe Ratio"], 2)}</div>
             </div>
             <div class="kpi-card">
+                <div class="tooltip">Relación entre ganancias totales y pérdidas totales.</div>
                 <div class="kpi-title">⚐ Profit Factor</div>
                 <div class="kpi-value">{round(row["Profit Factor"], 2)}</div>
             </div>
             <div class="kpi-card">
+                <div class="tooltip">Tasa de crecimiento anual compuesta.</div>
                 <div class="kpi-title">✓ CAGR</div>
                 <div class="kpi-value">{round(row["CAGR [%]"], 2)}%</div>
             </div>
             <div class="kpi-card">
+                <div class="tooltip">Rentabilidad promedio esperada por operación.</div>
                 <div class="kpi-title">≈ Expectancy</div>
                 <div class="kpi-value">{round(row["Expectancy [%]"], 2)}%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="tooltip">Duracion esperada</div>
+                <div class="kpi-title">⟳ Duracion</div>
+                <div class="kpi-value">{days} días {hours:02d}:{minutes:02d}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)

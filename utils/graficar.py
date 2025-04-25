@@ -12,18 +12,7 @@ def graficar(dfpl):
     p = figure(width=1000, height=500,
             title="RCB",
             background_fill_color="#efefef",
-            tooltips=[("Index", "@index"),("datetime", "@Datetime_str"), ("Open", "@Open"), ("High","@High"), ("Low","@Low"), ("Close","@Close"), 
-                    ("cdlengulfing","@cdlengulfing"), 
-                    ("cdlhammer","@cdlhammer"), 
-                    ("cdlmorningstar","@cdlmorningstar"), 
-                    ("cdlpiercing","@cdlpiercing"), 
-                    ("cdlclosingmarubozu","@cdlclosingmarubozu"), 
-                    ("cdlmarubozu","@cdlmarubozu"), 
-                    ("cdl3whitesoldiers","@cdl3whitesoldiers"), 
-                    ("cdlharami","@cdlharami"), 
-                    ("cdlharamicross","@cdlharamicross"), 
-                    ("cdlinvertdhammer","@cdlinvertdhammer"), 
-                    ("cdlladderbottom","@cdlladderbottom")]
+            tooltips=[("Index", "@index"),("datetime", "@Datetime_str"), ("Open", "@Open"), ("High","@High"), ("Low","@Low"), ("Close","@Close")]
             )
     p.xaxis.major_label_orientation = 0.8 # radians
     p.x_range.range_padding = 0.05
@@ -76,8 +65,7 @@ def graficar(dfpl):
             line_color="navy", fill_color="green", alpha=0.5, legend_label="Cambio Tendencia Bajista", source=dfpl)
     p.scatter(x="index", y="High", marker="square_pin", size=8,
             line_color="navy", fill_color="black", alpha=0.5, legend_label=val , source=dfpl[(dfpl.trendH==1)])
-    p.scatter(x="index", y="breakpointpos", marker="triangle", size=12,
-            line_color="navy", fill_color="black", alpha=0.5, legend_label="Ruptura del Canal", source=dfpl)
+    
     inicio = (dfpl[(dfpl.ind_posicion==0)].index).tolist()[0]
     vline=Span(location=inicio,dimension='height', line_color='grey',line_width=0.8, line_dash_offset= 0, line_dash='dashed', name="hola esto es una prueba", level='annotation', tags= ['square'])
 
@@ -88,6 +76,27 @@ def graficar(dfpl):
     color="purple",
     legend_label="Slope High",
     source=dfpl)
+    
+    entradas=dfpl[dfpl["isBreakOutIni"]==1]
+    p.triangle(
+        x=entradas.index,
+        y=entradas["Low"] - 2.5,  # un poco debajo del mínimo
+        size=12,
+        color="#184e77",
+        legend_label="Entrada",
+        alpha=0.8
+    )
+    
+    salidas=dfpl[dfpl["isBreakOutFinal"]==1]
+    p.inverted_triangle(
+        x=salidas.index,
+        y=salidas["High"] + 2.5,  # un poco encima del máximo
+        size=12,
+        color="#3a0ca3",
+        legend_label="Salida",
+        alpha=0.8
+    )
+    
     
     p.yaxis[0].formatter = NumeralTickFormatter(format="$0.00")
     p.xaxis.axis_label = "Fecha"
