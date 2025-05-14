@@ -105,17 +105,36 @@ def app_visitante():
         data = df_trades[columnas].copy()
         data.sort_values("EntryTime", ascending=False, inplace=True)
         data_mean=data[['Duration','EntryPrice','ExitPrice']]
-        
         #RESERVA DE ESPACIO
         kpi_holder=st.empty()
-        #Mostramos lo inicial
         df_inicial=df_stats.groupby("Ticker").mean(numeric_only=True).reset_index()
         
         with kpi_holder:
             mostrar_kpis_por_ticker(df_inicial, promedio=True,fecha=dict_fecha,data=data_mean)
         
+        #PRUEBA
+        #Evaluacion por ticker
+        df_casos["datetime"]=pd.to_datetime(df_casos['datetime'])
+        df_trades['EntryTime']=pd.to_datetime(df_trades['EntryTime'])
+        
+        #Mergeamos
+        df_diff=df_casos.merge(
+            df_trades,
+            left_on=['companyName','datetime'],
+            right_on=['Ticker','EntryTime'],
+            how='left',
+            indicator=True
+        )
+        
+        st.dataframe(df_casos) 
+        
+        #Filtrar las filas que no estan en el SUB
+        df_resultados=df_diff[df_diff['_merge']=='left_only'].drop(columns=['_merge','Ticker','EntryTime'])
+        st.dataframe(df_resultados)
+        
+            
+        
         # Mostrar grilla interactiva
-        #st.markdown("## 📋 Trades del Ticker Seleccionado")
         gb = GridOptionsBuilder.from_dataframe(data)
         gb.configure_selection("single", use_checkbox=True)
         
@@ -170,6 +189,8 @@ def app_visitante():
                 st.warning("⚠️ No hay ninguna fila seleccionada.")
         else: 
             st.warning("⚠️ No hay ninguna fila seleccionada.")
+
+        
 
     except Exception as e:
         st.error(f"❌ Error al cargar datos: {e}")
