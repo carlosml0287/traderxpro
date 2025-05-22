@@ -5,6 +5,7 @@ from bokeh.models import DatetimeTickFormatter, NumeralTickFormatter, Categorica
 
 def graficar(dfpl):
     dfpl.reset_index(drop=True, inplace=True)
+    
     inc = dfpl.query("Close>Open")
     dec = dfpl.query("Open>Close")
     TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
