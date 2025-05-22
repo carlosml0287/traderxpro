@@ -1,7 +1,4 @@
 import streamlit as st
-import pages.pm40 
-import pages.caida_normal
-import pages.caida_normal
 
 def generarSidebar():
     st.markdown("""
@@ -22,7 +19,8 @@ def generarSidebar():
                     
                     .st-emotion-cache-1oou9d  > p{
                         color: #fff;
-                        padding-bottom: 5px;    
+                        padding-bottom: 5px;  
+                        font-size:12px;  
                     }
                     .st-emotion-cache-1w3omjh {
                         font-size: 18px !important;  /* Aumenta el tamaño del texto */
@@ -37,19 +35,19 @@ def generarSidebar():
 
                 </style>
                 """,unsafe_allow_html=True)
-    #Variable para controlar la ventana emergente
-    if "mostrar_alerta" not in st.session_state:
-        st.session_state.mostrar_alerta=False
-    
     # Sección Historical en la sidebar con expander
-    with st.sidebar.expander("📜 Historical"):
-        st.page_link("pages/pm40.py", label="PM40", icon="⚙️")
-        st.page_link("pages/caida_normal.py", label="Caida Normal", icon="⚙️")
+    
+    with st.sidebar.expander("📜 Estrategias"):
+        #st.page_link("pages/pm40.py", label="PM40", icon="⚙️")
+        st.page_link("pages/visitante.py", label="Ϟ Ruptura Bajista")
+        st.page_link("pages/visitante.py", label="⩏ Caida Normal")
+        st.page_link("pages/visitante.py", label="⩚ Promedio Movil")
         #st.page_link("pages/rsi_bollinger.py", label="RSI + Bollinger", icon="📈")
 
     st.sidebar.markdown("<hr class='sidebar-separador'>", unsafe_allow_html=True)
 
     # Sección Time Real en la sidebar con expander (bloqueada si es visitante)
+    """
     with st.sidebar.expander("⏳ Real Time", expanded=False):
         if st.session_state.modo != "visitante":
             time_real = st.radio(
@@ -65,6 +63,6 @@ def generarSidebar():
             if st.button("🔑 Iniciar Sesión", key="iniciar_sesion_real_time"):
                 st.session_state.modo = "usuario"
                 st.rerun()
+    """
 
-
-    st.sidebar.markdown("<hr class='sidebar-separador'>", unsafe_allow_html=True)
+    #st.sidebar.markdown("<hr class='sidebar-separador'>", unsafe_allow_html=True)
