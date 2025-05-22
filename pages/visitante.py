@@ -155,11 +155,11 @@ def app_visitante():
                 caso=selected.iloc[0]['Caso']
                 st.success(f"Fila Seleccionada {ticker} | Fecha Entrada: {selected.iloc[0]['EntryTime']} | caso: {caso}")
                 dfpl = df.query("companyName == @ticker and caso == @caso")
+                st.dataframe(dfpl)
                 df_sub = df_stats[df_stats["Ticker"] == ticker]
-                st.success(dfpl.shape[0])
+                st.success("DF_CASOS_PRUEBA")
                 df_casos_prueba=dfpl.query("ind_posicion==0 or isBreakOutIni==1 or isBreakOutFinal==1").copy()
                 st.dataframe(df_casos_prueba)
-                
                 columna_for_ticker=data.query("Ticker== @ticker")
                 column_ticker_mean=columna_for_ticker[['Duration','EntryPrice','ExitPrice']]
                 with kpi_holder:
