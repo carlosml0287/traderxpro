@@ -47,9 +47,9 @@ def app_visitante():
     loading_placeholder.empty()
 
     # URLs
-    url_casos = "https://raw.githubusercontent.com/LinderCa/Notebooks_Trading/main/notebooks/data/cb_h.txt"
-    url_stats="https://raw.githubusercontent.com/LinderCa/Notebooks_Trading/main/notebooks/data/backtesting/resultados.csv"
-    url_stats_casos="https://raw.githubusercontent.com/LinderCa/Notebooks_Trading/main/notebooks/data/backtesting/resultados_casos.csv"
+    url_casos = "https://raw.githubusercontent.com/kaliinversionesyservicios/TraderEstrategias/main/data/cb_h.txt"
+    estadisticas="https://raw.githubusercontent.com/kaliinversionesyservicios/TraderEstrategias/main/data/backtesting/estadisticas.csv"
+    trades="https://raw.githubusercontent.com/kaliinversionesyservicios/TraderEstrategias/main/data/backtesting/trades.csv"
     #trade_urls = { }
     st.markdown("""
         <div style='text-align: left;'>
@@ -75,44 +75,46 @@ def app_visitante():
     """, unsafe_allow_html=True)
     try:
         df_casos=pd.read_csv(url_casos,sep='\t')
-        df_stats = pd.read_csv(url_stats)   
-        df_stats_casos=pd.read_csv(url_stats_casos)
-        
-        #Modificamos el tipo en datetime
-        df_stats["EntryTime"]=pd.to_datetime(df_stats["EntryTime"])
-        df_stats["ExitTime"]=pd.to_datetime(df_stats["ExitTime"])
-        df_stats_casos['EntryTime']=pd.to_datetime(df_stats_casos['EntryTime'])
-        df_stats_casos['ExitTime']=pd.to_datetime(df_stats_casos['ExitTime'])
+        df_estadisticas = pd.read_csv(estadisticas,sep='\t')   
+        df_trades=pd.read_csv(trades,sep='\t')
 
-        dict_fecha={'EntryTime':df_stats["EntryTime"].loc[0],'ExitTime':df_stats["ExitTime"].loc[0]}
+        st.dataframe(df_casos)
+        #Modificamos el tipo en datetime
+        df_estadisticas["EntryTime"]=pd.to_datetime(df_estadisticas["EntryTime"])
+        df_estadisticas["ExitTime"]=pd.to_datetime(df_estadisticas["ExitTime"])
+        df_trades['EntryTime']=pd.to_datetime(df_trades['EntryTime'])
+        df_trades['ExitTime']=pd.to_datetime(df_trades['ExitTime'])
+
+        dict_fecha={'EntryTime':df_estadisticas["EntryTime"].loc[0],'ExitTime':df_estadisticas["ExitTime"].loc[0]}
 
         # Mostrar métricas por ticker con selectbox
-        tickers = sorted(df_stats["Ticker"].unique())
+        tickers = sorted(df_estadisticas["Ticker"].unique())
         tickers.insert(0,"Todos")
         ticker_current=st.selectbox("Selecciona un ticker", tickers,key="ticker_selector")
-        st.success(f"Ticker seleccionado: {ticker_current}")
-        
+        #st.success(f"Ticker seleccionado: {ticker_current}")
+        columns=['Ticker','EntryTime','ExitTime','EntryPrice','ExitPrice','Duration','caso']
+
         if ticker_current=="Todos":
-            df_trades=df_stats_casos
+            df_grilla=df_trades[columns]
         else:
-            df_trades =df_stats_casos[df_stats_casos['Ticker']==ticker_current]
+            df_grilla =df_trades[df_trades['Ticker']==ticker_current]
+            df_grilla=df_grilla[columns]
 
         # Preprocesar columnas para grilla
-        #columnas = ["Ticker", "EntryTime", "ExitTime", "EntryPrice","ExitPrice", "Duration","Size","EntryBar","ExitBar"]
-        columnas = ["Ticker", "EntryTime", "ExitTime","Duration","EntryPrice","ExitPrice",'Caso']
-        data = df_trades[columnas].copy()
+        #columnas = ["Ticker", "EntryTime", "ExitTime","Duration","EntryPrice","ExitPrice",'Caso']
+        data = df_grilla[columns].copy()
         data.sort_values("EntryTime", ascending=False, inplace=True)
+
         data_mean=data[['Duration','EntryPrice','ExitPrice']]
         #RESERVA DE ESPACIO
         kpi_holder=st.empty()
 
-        df_inicial=df_stats.groupby("Ticker").mean(numeric_only=True).reset_index()
-
+        df_inicial=df_estadisticas.groupby("Ticker").mean(numeric_only=True).reset_index()
         with kpi_holder:
             mostrar_kpis_por_ticker(df_inicial, promedio=True,fecha=dict_fecha,data=data_mean)
         
         #PRUEBA
-        st.dataframe(df_casos) 
+        #st.dataframe(df_casos) 
 
         # Mostrar grilla interactiva
         gb = GridOptionsBuilder.from_dataframe(data)
@@ -141,7 +143,7 @@ def app_visitante():
 
         # 6) Cuando el usuario cambie el selectbox, **vuelve a pintar solo el placeholder**
         if ticker_current != "Todos":
-            df_sub = df_stats[df_stats['Ticker']==ticker_current]
+            df_sub = df_estadisticas[df_estadisticas['Ticker']==ticker_current]
             data_for_ticker=data[['Duration','EntryPrice','ExitPrice']]
             with kpi_holder:
                 mostrar_kpis_por_ticker(df_sub, promedio=False, fecha=dict_fecha,data=data_for_ticker)
@@ -152,14 +154,11 @@ def app_visitante():
                 st.markdown(f'<h3 style="color: #57cc99; text-align: left;">{titulo}</h3>', unsafe_allow_html=True)
                 df=tipo_vela()
                 ticker=selected.iloc[0]['Ticker']
-                caso=selected.iloc[0]['Caso']
+                caso=selected.iloc[0]['caso']
                 st.success(f"Fila Seleccionada {ticker} | Fecha Entrada: {selected.iloc[0]['EntryTime']} | caso: {caso}")
                 dfpl = df.query("companyName == @ticker and caso == @caso")
-                st.dataframe(dfpl)
-                df_sub = df_stats[df_stats["Ticker"] == ticker]
-                st.success("DF_CASOS_PRUEBA")
-                df_casos_prueba=dfpl.query("ind_posicion==0 or isBreakOutIni==1 or isBreakOutFinal==1").copy()
-                st.dataframe(df_casos_prueba)
+                df_sub = df_estadisticas[df_estadisticas["Ticker"] == ticker]
+                #df_casos_prueba=dfpl.query("ind_posicion==0 or isBreakOutIni==1 or isBreakOutFinal==1").copy()
                 columna_for_ticker=data.query("Ticker== @ticker")
                 column_ticker_mean=columna_for_ticker[['Duration','EntryPrice','ExitPrice']]
                 with kpi_holder:
